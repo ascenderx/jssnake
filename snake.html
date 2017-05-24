@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-US">
+   <head>
+      <title>Game 1</title>
+      <meta charset="UTF-8" />
+   </head>
+   <body style="background-color: #0f0f0f" >
+      <canvas id="gc" width="400px" height="400px" style="border: 1px solid white"></canvas>
+      <script type="text/javascript">
+         // canvas globals
+         var canvas  = document.getElementById('gc');
+         var context = canvas.getContext('2d');
+         var fps;
+         
+         // game globals
+         var w;      // snake & apple block width
+         var h;      // snake & apple block height
+         var ax;     // apple position X
+         var ay;     // apple position Y
+         var dx;     // snake velocity Dx
+         var dy;     // snake velocity Dy
+         var mag;    // (maximum) magnitude of velocity
+         var snake;  // snake body (array of blocks)
+         
+         window.onload = function()
+         {
+            // initialize globals
+            fps = 10;
+            w   = 10;
+            h   = 10;
+            mag = w;
+            dx  = mag;
+            dy  = 0;
+            
+            // generate the apple
+            regenApple();
+            
+            // generate the snake
+            snake  = [];
+            var sx = canvas.width / 2;
+            var sy = canvas.height / 2;
+            snake.push({x: sx, y: sy});
+            
+            // run the loop
+            setInterval(function()
+            {
+               drawAll();
+               updateAll();
+               detectCollisions();
+            }, 1000.0/fps);
+         }
+         
+         document.onkeydown = function(event)
+         {
+            switch(event.keyCode)
+            {
+               // left
+               case 37:
+                  dx = -mag;
+                  dy = 0;
+                  break;
+              
+               // up
+               case 38:
+                  dx = 0;
+                  dy = -mag;
+                  break;
+                  
+               // right
+               case 39:
+                  dx = mag;
+                  dy = 0;
+                  break;
+               
+               // down
+               case 40:
+                  dx = 0;
+                  dy = mag;
+                  break;
+            }
+         }
+         
+         function updateAll()
+         {
+            // move the snake
+            var sl = snake.length - 1;            
+            snake.push({x: snake[sl].x + dx, y: snake[sl].y + dy});
+            snake.shift();            
+
+            // wrap snake across screen
+            for (i = sl; i >= 0; i--)
+            {
+               if (snake[i].x + w > canvas.width)
+                  snake[i].x = 0;
+               else if (snake[i].x < 0)
+                  snake[i].x = canvas.width;
+               if (snake[i].y + h > canvas.height)
+                  snake[i].y = 0;
+               else if (snake[i].y < 0)
+                  snake[i].y = canvas.height;
+            }
+         }
+         
+         function detectCollisions()
+         {
+            // if snake eats apple, move it and grow snake
+            var sl = snake.length - 1;
+            if (snake[sl].x == ax && snake[sl].y == ay)
+            {
+               regenApple();
+               snake.unshift({x: snake[sl].x - dx, y: snake[sl].y - dy});
+            }
+         }
+         
+         function drawAll()
+         {
+            // draw the background
+            context.fillStyle = '#000000';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // draw the square
+            context.fillStyle = "#ff0000";
+            context.fillRect(ax, ay, w, h);
+
+            // draw the snake
+            for (i = 0; i < snake.length; i++)
+            {
+               context.fillStyle = "#00ff00";
+               context.fillRect(snake[i].x, snake[i].y, w, h);
+            }
+         }
+         
+         function regenApple()
+         {
+            ax = parseInt(Math.random() * canvas.width / w) * w;
+            ay = parseInt(Math.random() * canvas.height / h) * h;
+         }
+      </script>
+   </body>
+</html>
