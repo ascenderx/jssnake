@@ -4,12 +4,18 @@
       <title>Game 1</title>
       <meta charset="UTF-8" />
    </head>
-   <body style="background-color: #0f0f0f" >
+   <body style="background-color:#0f0f0f; color:white; font-family:monospace; font-size:20px">
       <canvas id="gc" width="400px" height="400px" style="border: 1px solid white"></canvas>
+      <br />
+      Score: <label id="lblScore" style="color:#00ff00"></label>
+      <br />
+      High Score: <label id="lblHScore" style="color:#ffff00"></label>
       <script type="text/javascript">
          // canvas globals
-         var canvas  = document.getElementById('gc');
-         var context = canvas.getContext('2d');
+         var canvas    = document.getElementById('gc');
+         var context   = canvas.getContext('2d');
+         var lblScore  = document.getElementById('lblScore');
+         var lblHScore = document.getElementById('lblHScore');
          var fps;
          
          // game globals
@@ -21,25 +27,26 @@
          var dy;     // snake velocity Dy
          var mag;    // (maximum) magnitude of velocity
          var snake;  // snake body (array of blocks)
+         var score;  // current score
+         var hScore; // high score
          
          window.onload = function()
          {
             // initialize globals
-            fps = 10;
-            w   = 10;
-            h   = 10;
-            mag = w;
-            dx  = mag;
-            dy  = 0;
+            fps    = 12;
+            w      = 10;
+            h      = 10;
+            mag    = w;
+            dx     = mag;
+            dy     = 0;
+            score  = 0;
+            hScore = 0;
             
             // generate the apple
             regenApple();
             
             // generate the snake
-            snake  = [];
-            var sx = canvas.width / 2;
-            var sy = canvas.height / 2;
-            snake.push({x: sx, y: sy});
+            regenSnake();
             
             // run the loop
             setInterval(function()
@@ -99,6 +106,10 @@
                else if (snake[i].y < 0)
                   snake[i].y = canvas.height;
             }
+            
+            // print data to screen
+            lblScore.innerHTML  = score;
+            lblHScore.innerHTML = hScore;
          }
          
          function detectCollisions()
@@ -109,6 +120,20 @@
             {
                regenApple();
                snake.unshift({x: snake[sl].x - dx, y: snake[sl].y - dy});
+               score++;
+               if (score > hScore)
+                  hScore = score;
+            }
+            
+            // if snake eats itself, shrink it back to beginning size
+            for (i = 1; i < sl; i++)
+            {
+               if (snake[sl].x == snake[i].x && snake[sl].y == snake[i].y)
+               {
+                  for (i = 2; i < sl; i++)
+                     snake.shift();
+                  score = 0;
+               }   
             }
          }
          
@@ -134,6 +159,16 @@
          {
             ax = parseInt(Math.random() * canvas.width / w) * w;
             ay = parseInt(Math.random() * canvas.height / h) * h;
+         }
+         
+         function regenSnake()
+         {
+            snake = [];
+            var sx = canvas.width / 2;
+            var sy = canvas.height / 2;
+            snake.unshift({x: sx,          y: sy});
+            snake.unshift({x: sx - dx,     y: sy - dy});
+            snake.unshift({x: sx - 2 * dx, y: sy - 2 * dy});
          }
       </script>
    </body>
