@@ -14,25 +14,29 @@
       Score: <label id="lblScore" style="color:#00ff00"></label>
       <br />
       High Score: <label id="lblHScore" style="color:#ffff00"></label>
+      <br />
+      <label id="lblPaused" style="color:#ff0000"></label>
       <script type="text/javascript">
          // canvas globals
          var canvas    = document.getElementById('gc');
          var context   = canvas.getContext('2d');
          var lblScore  = document.getElementById('lblScore');
          var lblHScore = document.getElementById('lblHScore');
+         var lblPaused = document.getElementById('lblPaused');
          var fps;
          
          // game globals
-         var w;      // snake & apple block width
-         var h;      // snake & apple block height
-         var ax;     // apple position X
-         var ay;     // apple position Y
-         var dx;     // snake velocity Dx
-         var dy;     // snake velocity Dy
-         var mag;    // (maximum) magnitude of velocity
-         var snake;  // snake body (array of blocks)
-         var score;  // current score
-         var hScore; // high score
+         var dim;            // snake & apple block width & height
+         var ax;             // apple position X
+         var ay;             // apple position Y
+         var dx;             // snake velocity Dx
+         var dy;             // snake velocity Dy
+         var mag;            // (maximum) magnitude of velocity
+         var snake;          // snake body (array of blocks)
+         var score;          // current score
+         var hScore;         // high score
+         var paused;         // is the game paused?
+         var updateCallBack; // toggled with pause button
          
          /******************
           * INITIALIZATION *
@@ -41,13 +45,13 @@
          {
             // initialize globals
             fps    = 12;
-            w      = 10;
-            h      = 10;
-            mag    = w;
+            dim    = 10;
+            mag    = dim;
             dx     = mag;
             dy     = 0;
             score  = 0;
             hScore = 0;
+            paused = false;
             
             // generate the apple
             regenApple();
@@ -55,12 +59,16 @@
             // generate the snake
             regenSnake();
             
+            // specify the update callback
+            updateCallback = updateAll;
+            
             // run the loop
             setInterval(function()
             {
                drawAll();
-               updateAll();
+               updateCallback();
                detectCollisions();
+               printData();
             }, 1000.0/fps);
          }
          
@@ -94,6 +102,15 @@
                   dx = 0;
                   dy = mag;
                   break;
+               
+               // pause / break
+               case 19:
+                  paused = !paused;
+                  if (paused)
+                     updateCallback = function() { /* do nothing */ }
+                  else
+                     updateCallback = updateAll;
+                  break;
             }
          }
          
@@ -110,19 +127,28 @@
             // wrap snake across screen
             for (i = sl; i >= 0; i--)
             {
-               if (snake[i].x + w > canvas.width)
+               if (snake[i].x + dim > canvas.width)
                   snake[i].x = 0;
                else if (snake[i].x < 0)
                   snake[i].x = canvas.width;
-               if (snake[i].y + h > canvas.height)
+               if (snake[i].y + dim > canvas.height)
                   snake[i].y = 0;
                else if (snake[i].y < 0)
                   snake[i].y = canvas.height;
             }
-            
-            // print data to screen
+         }
+         
+         /******************************
+          * PRINT DATA TO THE DOCUMENT *
+          ******************************/
+         function printData()
+         {
             lblScore.innerHTML  = score;
             lblHScore.innerHTML = hScore;
+            if (paused)
+               lblPaused.innerHTML = 'PAUSED';
+            else
+               lblPaused.innerHTML = '';
          }
          
          /*************************
@@ -164,13 +190,13 @@
             
             // draw the square
             context.fillStyle = "#ff0000";
-            context.fillRect(ax, ay, w, h);
+            context.fillRect(ax, ay, dim, dim);
 
             // draw the snake
             for (i = 0; i < snake.length; i++)
             {
                context.fillStyle = "#00ff00";
-               context.fillRect(snake[i].x, snake[i].y, w, h);
+               context.fillRect(snake[i].x, snake[i].y, dim, dim);
             }
          }
          
@@ -179,8 +205,8 @@
           ************************/
          function regenApple()
          {
-            ax = parseInt(Math.random() * canvas.width / w) * w;
-            ay = parseInt(Math.random() * canvas.height / h) * h;
+            ax = parseInt(Math.random() * canvas.width / dim) * dim;
+            ay = parseInt(Math.random() * canvas.height / dim) * dim;
          }
          
          /************************
