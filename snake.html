@@ -3,6 +3,10 @@
    <head>
       <title>Game 1</title>
       <meta charset="UTF-8" />
+      <!--
+         This code inspired by Gamkedo:
+         https://youtu.be/xGmXxpIj6vs
+       -->
    </head>
    <body style="background-color:#0f0f0f; color:white; font-family:monospace; font-size:20px">
       <canvas id="gc" width="400px" height="400px" style="border: 1px solid white"></canvas>
@@ -30,6 +34,9 @@
          var score;  // current score
          var hScore; // high score
          
+         /******************
+          * INITIALIZATION *
+          ******************/
          window.onload = function()
          {
             // initialize globals
@@ -57,6 +64,9 @@
             }, 1000.0/fps);
          }
          
+         /*********************
+          * KEYBOARD CALLBACK *
+          *********************/
          document.onkeydown = function(event)
          {
             switch(event.keyCode)
@@ -87,6 +97,9 @@
             }
          }
          
+         /*****************************
+          * UPDATE ALL OBJECTS & DATA *
+          *****************************/
          function updateAll()
          {
             // move the snake
@@ -112,6 +125,9 @@
             lblHScore.innerHTML = hScore;
          }
          
+         /*************************
+          * DETECT ALL COLLISIONS *
+          *************************/
          function detectCollisions()
          {
             // if snake eats apple, move it and grow snake
@@ -137,6 +153,9 @@
             }
          }
          
+         /********************
+          * DRAW ALL OBJECTS *
+          ********************/
          function drawAll()
          {
             // draw the background
@@ -155,12 +174,18 @@
             }
          }
          
+         /************************
+          * REGENERATE THE APPLE *
+          ************************/
          function regenApple()
          {
             ax = parseInt(Math.random() * canvas.width / w) * w;
             ay = parseInt(Math.random() * canvas.height / h) * h;
          }
          
+         /************************
+          * REGENERATE THE SNAKE *
+          ************************/
          function regenSnake()
          {
             snake = [];
