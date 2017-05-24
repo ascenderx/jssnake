@@ -79,30 +79,40 @@
          {
             switch(event.keyCode)
             {
+               // a
+               case 65:
                // left
                case 37:
                   dx = -mag;
                   dy = 0;
                   break;
               
+               // w
+               case 87:
                // up
                case 38:
                   dx = 0;
                   dy = -mag;
                   break;
-                  
+               
+               // d
+               case 68:
                // right
                case 39:
                   dx = mag;
                   dy = 0;
                   break;
                
+               // s
+               case 83:
                // down
                case 40:
                   dx = 0;
                   dy = mag;
                   break;
                
+               // p
+               case 80:
                // pause / break
                case 19:
                   paused = !paused;
