@@ -13,12 +13,24 @@
             background-color: #0f0f0f;
             color: white;
             font-family: monospace;
-            font-size: 20px;
+            font-size: 14px;
+         }
+         
+         #divContent
+         {
+            width: 452px;
+            text-align: justify;
          }
          
          canvas
          {
             border: 1px solid white;
+         }
+         
+         .instructions
+         {
+            font-style: italic;
+            color: #ff7fff;
          }
          
          .key
@@ -29,6 +41,11 @@
          #lblScore
          {
             color: #00ff00;
+         }
+         
+         #lblRecents
+         {
+            color: #ff7f00;
          }
          
          #lblHScore
@@ -43,48 +60,68 @@
        </style>
    </head>
    <body>
-      <canvas id="gc" width="400px" height="400px"></canvas>
-      <br />
-      <label class='key'>A</label> or <label class='key'>&larr;</label> 
-      to move left
-      <br />
-      <label class='key'>D</label> or <label class='key'>&rarr;</label>
-      to move right
-      <br />
-      <label class='key'>W</label> or <label class='key'>&uarr;</label>
-      to move up
-      <br />
-      <label class='key'>S</label> or <label class='key'>&darr;</label>
-      to move down
-      <br />
-      <label class='key'>P</label> or <label class='key'>Pause/Break</label>
-      to pause
-      <br /><br />
-      Score: <label id="lblScore"></label>
-      <br />
-      High Score: <label id="lblHScore"></label>
-      <br />
-      <label id="lblPaused"></label>
+      <div id="divContent">
+         <canvas id="gc" width="500px" height="500px"></canvas>
+         <br />
+         <label class="instructions">
+            You are the green snake. You are hungry for apples.<br />
+            Get the red apple to increase your length.<br />
+            Be careful not to run into yourself or you'll shrink!
+         </label>
+         <br /><br />
+         <label class='key'>A</label> or <label class='key'>&larr;</label> 
+         to move left
+         <br />
+         <label class='key'>D</label> or <label class='key'>&rarr;</label>
+         to move right
+         <br />
+         <label class='key'>W</label> or <label class='key'>&uarr;</label>
+         to move up
+         <br />
+         <label class='key'>S</label> or <label class='key'>&darr;</label>
+         to move down
+         <br />
+         <label class='key'>P</label> or <label class='key'>Pause/Break</label>
+         to pause
+         <br /><br />
+         Score: <label id="lblScore"></label>
+         <br />
+         Recent Scores: <label id="lblRecents"></label>
+         <br />
+         High Score: <label id="lblHScore"></label>
+         <br />
+         <label id="lblPaused"></label>
+      </div>
       <script type="text/javascript">
          // canvas globals
-         var canvas    = document.getElementById('gc');
-         var context   = canvas.getContext('2d');
-         var lblScore  = document.getElementById('lblScore');
-         var lblHScore = document.getElementById('lblHScore');
-         var lblPaused = document.getElementById('lblPaused');
+         var canvas     = domById('gc');
+         var context    = canvas.getContext('2d');
+         var lblScore   = domById('lblScore');
+         var lblRecents = domById('lblRecents');
+         var lblHScore  = domById('lblHScore');
+         var lblPaused  = domById('lblPaused');
          var fps;
          
          // game globals
-         var dim;            // snake & apple block width & height
-         var ax;             // apple position X
-         var ay;             // apple position Y
-         var dx;             // snake velocity Dx
-         var dy;             // snake velocity Dy
-         var mag;            // (maximum) magnitude of velocity
-         var snake;          // snake body (array of blocks)
-         var score;          // current score
-         var hScore;         // high score
-         var paused;         // is the game paused?
+         var dim;     // snake & apple block width & height
+         var ax;      // apple position X
+         var ay;      // apple position Y
+         var dx;      // snake velocity Dx
+         var dy;      // snake velocity Dy
+         var mag;     // (maximum) magnitude of velocity
+         var snake;   // snake body (array of blocks)
+         var score;   // current score
+         var recents; // recent scores
+         var hScore;  // high score
+         var paused;  // is the game paused?
+         
+         /***********************************
+          * GET DOCUMENT OBJECT MODEL BY ID *
+          ***********************************/
+         function domById(id)
+         {
+            return document.getElementById(id);
+         }
          
          /******************
           * INITIALIZATION *
@@ -92,14 +129,15 @@
          window.onload = function()
          {
             // initialize globals
-            fps    = 12;
-            dim    = 10;
-            mag    = dim;
-            dx     = mag;
-            dy     = 0;
-            score  = 0;
-            hScore = 0;
-            paused = false;
+            fps     = 15;
+            dim     = 10;
+            mag     = dim;
+            dx      = mag;
+            dy      = 0;
+            score   = 0;
+            recents = '';
+            hScore  = 0;
+            paused  = false;
             
             // generate the apple
             regenApple();
@@ -114,6 +152,7 @@
             setInterval(function()
             {
                drawAll();
+               
                if (!paused)
                {
                   updateAll();
@@ -121,6 +160,7 @@
                }
                
                printData();
+               
             }, 1000.0/fps);
          }
          
@@ -135,32 +175,52 @@
                case 65:
                // left
                case 37:
-                  dx = -mag;
-                  dy = 0;
+                  // prohibit turning right
+                  if (dx == 0 && dy != 0)
+                  {
+                     // turn to the left
+                     dx = -mag;
+                     dy = 0;
+                  }
                   break;
               
                // w
                case 87:
                // up
                case 38:
-                  dx = 0;
-                  dy = -mag;
+                  // prohibit turning downward
+                  if (dx != 0 && dy == 0)
+                  {
+                     // turn upward
+                     dx = 0;
+                     dy = -mag;
+                  }
                   break;
                
                // d
                case 68:
                // right
                case 39:
-                  dx = mag;
-                  dy = 0;
+                  // prohibit turning left
+                  if (dx == 0 && dy != 0)
+                  {
+                     // turn to the right
+                     dx = mag;
+                     dy = 0;
+                  }
                   break;
                
                // s
                case 83:
                // down
                case 40:
-                  dx = 0;
-                  dy = mag;
+                  // prohibit moving upward
+                  if (dx != 0 && dy == 0)
+                  {
+                     // turn downward
+                     dx = 0;
+                     dy = mag;
+                  }
                   break;
                
                // p
@@ -200,8 +260,9 @@
           ******************************/
          function printData()
          {
-            lblScore.innerHTML  = score;
-            lblHScore.innerHTML = hScore;
+            lblScore.innerHTML   = score;
+            lblRecents.innerHTML = recents;
+            lblHScore.innerHTML  = hScore;
             if (paused)
                lblPaused.innerHTML = 'PAUSED';
             else
@@ -231,7 +292,8 @@
                {
                   for (i = 2; i < sl; i++)
                      snake.shift();
-                  score = 0;
+                  recents = score + ' ' + recents;
+                  score   = 0
                }   
             }
          }
