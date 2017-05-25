@@ -85,7 +85,6 @@
          var score;          // current score
          var hScore;         // high score
          var paused;         // is the game paused?
-         var updateCallBack; // toggled with pause button
          
          /******************
           * INITIALIZATION *
@@ -115,8 +114,12 @@
             setInterval(function()
             {
                drawAll();
-               updateCallback();
-               detectCollisions();
+               if (!paused)
+               {
+                  updateAll();
+                  detectCollisions();
+               }
+               
                printData();
             }, 1000.0/fps);
          }
@@ -165,11 +168,6 @@
                // pause / break
                case 19:
                   paused = !paused;
-                  if (paused)
-                     updateCallback = function() { /* do nothing */ }
-                  else
-                     updateCallback = updateAll;
-                  break;
             }
          }
          
