@@ -56,17 +56,20 @@
          #lblPaused
          {
             color: #ff0000;
+            font-size: 20px;
          }
        </style>
    </head>
    <body>
       <div id="divContent">
-         <canvas id="gc" width="500px" height="500px"></canvas>
+         <canvas id="gc" width="300px" height="300px"></canvas>
+         <br />
+         <label id="lblPaused"></label>
          <br />
          <label class="instructions">
             You are the green snake. You are hungry for apples.<br />
             Get the red apple to increase your length.<br />
-            Be careful not to run into yourself or you'll shrink!
+            Be careful not to run into yourself or the walls or you'll shrink!
          </label>
          <br /><br />
          <label class='key'>A</label> or <label class='key'>&larr;</label> 
@@ -88,9 +91,7 @@
          <br />
          Recent Scores: <label id="lblRecents"></label>
          <br />
-         High Score: <label id="lblHScore"></label>
-         <br />
-         <label id="lblPaused"></label>
+         High Score: <label id="lblHScore"></label>         
       </div>
       <script type="text/javascript">
          // canvas globals
@@ -129,7 +130,7 @@
          window.onload = function()
          {
             // initialize globals
-            fps     = 15;
+            fps     = 12;
             dim     = 10;
             mag     = dim;
             dx      = mag;
@@ -240,19 +241,6 @@
             var sl = snake.length - 1;            
             snake.push({x: snake[sl].x + dx, y: snake[sl].y + dy});
             snake.shift();            
-
-            // wrap snake across screen
-            for (i = sl; i >= 0; i--)
-            {
-               if (snake[i].x + dim > canvas.width)
-                  snake[i].x = 0;
-               else if (snake[i].x < 0)
-                  snake[i].x = canvas.width;
-               if (snake[i].y + dim > canvas.height)
-                  snake[i].y = 0;
-               else if (snake[i].y < 0)
-                  snake[i].y = canvas.height;
-            }
          }
          
          /******************************
@@ -281,8 +269,6 @@
                regenApple();
                snake.unshift({x: snake[sl].x - dx, y: snake[sl].y - dy});
                score++;
-               if (score > hScore)
-                  hScore = score;
             }
             
             // if snake eats itself, shrink it back to beginning size
@@ -292,9 +278,33 @@
                {
                   for (i = 2; i < sl; i++)
                      snake.shift();
-                  recents = score + ' ' + recents;
-                  score   = 0
-               }   
+                  resetScore();
+               } 
+            }
+            
+            /*
+            // wrap snake across screen
+            for (i = sl; i >= 0; i--)
+            {
+               if (snake[i].x + dim > canvas.width)
+                  snake[i].x = 0;
+               else if (snake[i].x < 0)
+                  snake[i].x = canvas.width;
+               if (snake[i].y + dim > canvas.height)
+                  snake[i].y = 0;
+               else if (snake[i].y < 0)
+                  snake[i].y = canvas.height;
+            }
+            */
+            
+            // if the snake hits the edges, reset it
+            if (snake[sl].x + dim > canvas.width  ||
+                snake[sl].x       < 0             ||
+                snake[sl].y + dim > canvas.height ||
+                snake[sl].y       < 0)
+            {
+               resetScore();
+               regenSnake();
             }
          }
          
@@ -339,6 +349,23 @@
             snake.unshift({x: sx,          y: sy});
             snake.unshift({x: sx - dx,     y: sy - dy});
             snake.unshift({x: sx - 2 * dx, y: sy - 2 * dy});
+         }
+         
+         /***************
+          * RESET SCORE *
+          ***************/
+         function resetScore()
+         {
+            // update high score if new
+            if (score > hScore)
+                  hScore = score;
+            
+            // update recent scores if last score was not zero
+            if (score > 0)
+               recents = score + ' ' + recents;
+            
+            // reset current score
+            score = 0
          }
       </script>
    </body>
