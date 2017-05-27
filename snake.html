@@ -18,8 +18,7 @@
          
          #divContent
          {
-            width: 452px;
-            text-align: justify;
+            text-align: center;
          }
          
          canvas
@@ -58,40 +57,51 @@
             color: #ff0000;
             font-size: 20px;
          }
+         
+         #lblWrap
+         {
+            color: #0f0f0f;
+         }
        </style>
    </head>
    <body>
       <div id="divContent">
-         <canvas id="gc" width="300px" height="300px"></canvas>
+         <canvas id="gc" width="400px" height="400px"></canvas>
          <br />
          <label id="lblPaused"></label>
          <br />
-         <label class="instructions">
-            You are the green snake. You are hungry for apples.<br />
-            Get the red apple to increase your length.<br />
-            Be careful not to run into yourself or the walls or you'll shrink!
-         </label>
+         <input type="checkbox" id="chkExtra"/>Show instructions
          <br /><br />
-         <label class='key'>A</label> or <label class='key'>&larr;</label> 
-         to move left
-         <br />
-         <label class='key'>D</label> or <label class='key'>&rarr;</label>
-         to move right
-         <br />
-         <label class='key'>W</label> or <label class='key'>&uarr;</label>
-         to move up
-         <br />
-         <label class='key'>S</label> or <label class='key'>&darr;</label>
-         to move down
-         <br />
-         <label class='key'>P</label> or <label class='key'>Pause/Break</label>
-         to pause
-         <br /><br />
+         <div id="divExtra">
+            <label class="instructions">
+               You are the green snake. You are hungry for apples.<br />
+               Get the red apple to increase your length.<br />
+               Be careful not to run into yourself or the walls or you'll shrink!
+            </label>
+            <br /><br />
+            <label class='key'>A</label> or <label class='key'>&larr;</label> 
+            to move left
+            <br />
+            <label class='key'>D</label> or <label class='key'>&rarr;</label>
+            to move right
+            <br />
+            <label class='key'>W</label> or <label class='key'>&uarr;</label>
+            to move up
+            <br />
+            <label class='key'>S</label> or <label class='key'>&darr;</label>
+            to move down
+            <br />
+            <label class='key'>P</label> or <label class='key'>Pause/Break</label>
+            to pause
+            <br /><br />
+         </div>
          Score: <label id="lblScore"></label>
          <br />
          Recent Scores: <label id="lblRecents"></label>
          <br />
-         High Score: <label id="lblHScore"></label>         
+         High Score: <label id="lblHScore"></label>        
+         <br /><br />
+         <label id="lblWrap">WRAP DISABLED</label>
       </div>
       <script type="text/javascript">
          // canvas globals
@@ -101,6 +111,8 @@
          var lblRecents = domById('lblRecents');
          var lblHScore  = domById('lblHScore');
          var lblPaused  = domById('lblPaused');
+         var chkExtra   = domById('chkExtra');
+         var divExtra   = domById('divExtra');
          var fps;
          
          // game globals
@@ -115,6 +127,7 @@
          var recents; // recent scores
          var hScore;  // high score
          var paused;  // is the game paused?
+         var doWrap;  // is wrapping allowed?
          
          /***********************************
           * GET DOCUMENT OBJECT MODEL BY ID *
@@ -130,7 +143,7 @@
          window.onload = function()
          {
             // initialize globals
-            fps     = 12;
+            fps     = 15;
             dim     = 10;
             mag     = dim;
             dx      = mag;
@@ -139,6 +152,11 @@
             recents = '';
             hScore  = 0;
             paused  = false;
+            doWrap  = false;
+            
+            // hide the instructions by default
+            chkExtra.checked = false;
+            divExtra.hidden  = true;
             
             // generate the apple
             regenApple();
@@ -163,6 +181,33 @@
                printData();
                
             }, 1000.0/fps);
+         }
+         
+         /*************************
+          * SHOW/HIDE EXTRA DATA  *
+          *************************/
+         chkExtra.onchange = function()
+         {
+            divExtra.hidden = !chkExtra.checked;
+         }
+         
+         /***********************
+          * TOGGLE WRAP ABILITY *
+          ***********************/
+         lblWrap.onclick = function()
+         {
+            doWrap = !doWrap;
+            
+            if (doWrap)
+            {
+               lblWrap.style.color = '#00ff00';
+               lblWrap.innerHTML   = 'WRAP ENABLED';
+            }
+            else
+            {
+               lblWrap.style.color = '#0f0f0f';
+               lblWrap.innerHTML   = 'WRAP DISABLED';
+            }
          }
          
          /*********************
@@ -251,6 +296,7 @@
             lblScore.innerHTML   = score;
             lblRecents.innerHTML = recents;
             lblHScore.innerHTML  = hScore;
+            
             if (paused)
                lblPaused.innerHTML = 'PAUSED';
             else
@@ -282,29 +328,32 @@
                } 
             }
             
-            /*
-            // wrap snake across screen
-            for (i = sl; i >= 0; i--)
+            if (doWrap)
             {
-               if (snake[i].x + dim > canvas.width)
-                  snake[i].x = 0;
-               else if (snake[i].x < 0)
-                  snake[i].x = canvas.width;
-               if (snake[i].y + dim > canvas.height)
-                  snake[i].y = 0;
-               else if (snake[i].y < 0)
-                  snake[i].y = canvas.height;
+               // wrap snake across screen
+               for (i = sl; i >= 0; i--)
+               {
+                  if (snake[i].x + dim > canvas.width)
+                     snake[i].x = 0;
+                  else if (snake[i].x < 0)
+                     snake[i].x = canvas.width;
+                  if (snake[i].y + dim > canvas.height)
+                     snake[i].y = 0;
+                  else if (snake[i].y < 0)
+                     snake[i].y = canvas.height;
+               }
             }
-            */
-            
-            // if the snake hits the edges, reset it
-            if (snake[sl].x + dim > canvas.width  ||
-                snake[sl].x       < 0             ||
-                snake[sl].y + dim > canvas.height ||
-                snake[sl].y       < 0)
+            else
             {
-               resetScore();
-               regenSnake();
+               // if the snake hits the edges, reset it
+               if (snake[sl].x + dim > canvas.width  ||
+                   snake[sl].x       < 0             ||
+                   snake[sl].y + dim > canvas.height ||
+                   snake[sl].y       < 0)
+               {
+                  resetScore();
+                  regenSnake();
+               }
             }
          }
          
@@ -334,8 +383,13 @@
           ************************/
          function regenApple()
          {
-            ax = parseInt(Math.random() * canvas.width / dim) * dim;
+            /*
+            ax = parseInt(Math.random() * canvas.width  / dim) * dim;
             ay = parseInt(Math.random() * canvas.height / dim) * dim;
+            */
+            
+            ax = randomize(dim, canvas.width  - dim, dim);
+            ay = randomize(dim, canvas.height - dim, dim);
          }
          
          /************************
@@ -366,6 +420,15 @@
             
             // reset current score
             score = 0
+         }
+         
+         /***************************
+          * GENERATE RANDOM INTEGER *
+          ***************************/
+         function randomize(minimum, maximum, modulus)
+         {
+            var num = Math.random() * (maximum - minimum) + minimum;
+            return parseInt(num / modulus) * modulus;
          }
       </script>
    </body>
