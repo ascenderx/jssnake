@@ -66,11 +66,13 @@
    </head>
    <body>
       <div id="divContent">
-         <canvas id="gc" width="400px" height="400px"></canvas>
+         <canvas id="gc" width="300px" height="300px"></canvas>
          <br />
          <label id="lblPaused"></label>
          <br />
-         <input type="checkbox" id="chkExtra"/>Show instructions
+         <input type="checkbox" id="chkSound" />Enable sound
+         <br />
+         <input type="checkbox" id="chkExtra" />Show instructions
          <br /><br />
          <div id="divExtra">
             <label class="instructions">
@@ -111,6 +113,7 @@
          var lblRecents = domById('lblRecents');
          var lblHScore  = domById('lblHScore');
          var lblPaused  = domById('lblPaused');
+         var chkSound   = domById('chkSound');
          var chkExtra   = domById('chkExtra');
          var divExtra   = domById('divExtra');
          var fps;
@@ -128,6 +131,11 @@
          var hScore;  // high score
          var paused;  // is the game paused?
          var doWrap;  // is wrapping allowed?
+         var sound1;  // 'move' sound
+         var sound2;  // 'eat apple' sound
+         var sound3;  // 'fail' sound
+         var sound4;  // 'pause' sound
+         var sound5;  // 'beat high score' sound
          
          /***********************************
           * GET DOCUMENT OBJECT MODEL BY ID *
@@ -153,10 +161,18 @@
             hScore  = 0;
             paused  = false;
             doWrap  = false;
+            sound1  = new Audio('move.wav');
+            sound2  = new Audio('eat.wav');
+            sound3  = new Audio('fail.wav');
+            sound4  = new Audio('pause.wav');
+            sound5  = new Audio('uphigh.wav');
             
             // hide the instructions by default
             chkExtra.checked = false;
             divExtra.hidden  = true;
+            
+            // enable sounds by default
+            chkSound.checked = true;
             
             // generate the apple
             regenApple();
@@ -227,6 +243,9 @@
                      // turn to the left
                      dx = -mag;
                      dy = 0;
+                     
+                     // play sound
+                     playSound(sound1);
                   }
                   break;
               
@@ -240,6 +259,9 @@
                      // turn upward
                      dx = 0;
                      dy = -mag;
+                     
+                     // play sound
+                     playSound(sound1);
                   }
                   break;
                
@@ -253,6 +275,9 @@
                      // turn to the right
                      dx = mag;
                      dy = 0;
+                     
+                     // play sound
+                     playSound(sound1);
                   }
                   break;
                
@@ -266,6 +291,9 @@
                      // turn downward
                      dx = 0;
                      dy = mag;
+                     
+                     // play sound
+                     playSound(sound1);
                   }
                   break;
                
@@ -274,6 +302,10 @@
                // pause / break
                case 19:
                   paused = !paused;
+                  
+                  // play sound
+                  playSound(sound4);
+                  break;
             }
          }
          
@@ -315,9 +347,16 @@
                regenApple();
                snake.unshift({x: snake[sl].x - dx, y: snake[sl].y - dy});
                score++;
+               
+               // play sound
+               if (hScore == 0 || score != hScore + 1)
+                  playSound(sound2);
+               else if (score == hScore + 1)
+                  playSound(sound5);
             }
             
             // if snake eats itself, shrink it back to beginning size
+            var sl = snake.length - 1;
             for (i = 1; i < sl; i++)
             {
                if (snake[sl].x == snake[i].x && snake[sl].y == snake[i].y)
@@ -325,11 +364,16 @@
                   for (i = 2; i < sl; i++)
                      snake.shift();
                   resetScore();
+                  
+                  // play sound
+                  playSound(sound3);
                } 
             }
             
             if (doWrap)
             {
+               // update snake length
+               sl = snake.length - 1;
                // wrap snake across screen
                for (i = sl; i >= 0; i--)
                {
@@ -343,8 +387,11 @@
                      snake[i].y = canvas.height;
                }
             }
-            else
+            else // !doWrap
             {
+               // update snake length
+               sl = snake.length - 1;
+               
                // if the snake hits the edges, reset it
                if (snake[sl].x + dim > canvas.width  ||
                    snake[sl].x       < 0             ||
@@ -353,6 +400,10 @@
                {
                   resetScore();
                   regenSnake();
+                  
+                  // play sound
+                  if (sl > 2)
+                     playSound(sound3);
                }
             }
          }
@@ -378,16 +429,21 @@
             }
          }
          
+         /**************
+          * PLAY SOUND *
+          **************/
+         function playSound(sound)
+         {
+            // only play sounds if they're enabled
+            if (chkSound.checked)
+               sound.play();
+         }
+         
          /************************
           * REGENERATE THE APPLE *
           ************************/
          function regenApple()
          {
-            /*
-            ax = parseInt(Math.random() * canvas.width  / dim) * dim;
-            ay = parseInt(Math.random() * canvas.height / dim) * dim;
-            */
-            
             ax = randomize(dim, canvas.width  - dim, dim);
             ay = randomize(dim, canvas.height - dim, dim);
          }
