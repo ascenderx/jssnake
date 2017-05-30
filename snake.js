@@ -74,22 +74,23 @@ window.onload = function()
    // generate the snake
    regenSnake();
    
-   // specify the update callback
-   updateCallback = updateAll;
-   
    // run the loop
    setInterval(function()
    {
+      // draw the things
       drawAll();
       
+      // update the things, if not paused
       if (!paused)
       {
          updateAll();
          detectCollisions();
       }
       
+      // print data to the HTML document
       printData();
       
+      // every 1/fps seconds
    }, 1000.0/fps);
 }
 
