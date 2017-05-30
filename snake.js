@@ -30,6 +30,8 @@ var sound2;  // 'eat apple' sound
 var sound3;  // 'fail' sound
 var sound4;  // 'pause' sound
 var sound5;  // 'beat high score' sound
+var sound6;  // 'wrap on' sound
+var sound7;  // 'wrap off' sound
 
 /***********************************
  * GET DOCUMENT OBJECT MODEL BY ID *
@@ -60,6 +62,8 @@ window.onload = function()
    sound3  = new Audio('fail2.wav');
    sound4  = new Audio('pause.wav');
    sound5  = new Audio('uphigh.wav');
+   sound6  = new Audio('wrapon.wav');
+   sound7  = new Audio('wrapoff.wav');
    
    // hide the instructions by default
    chkExtra.checked = false;
@@ -113,11 +117,17 @@ lblWrap.onclick = function()
    {
       lblWrap.style.color = '#00ff00';
       lblWrap.innerHTML   = 'WRAP ENABLED';
+      
+      // play sound
+      playSound(sound6);
    }
    else
    {
       lblWrap.style.color = '#0f0f0f';
       lblWrap.innerHTML   = 'WRAP DISABLED';
+      
+      // play sound
+      playSound(sound7);
    }
 }
 
@@ -333,7 +343,11 @@ function playSound(sound)
 {
    // only play sounds if they're enabled
    if (chkSound.checked)
+   {
+      // restart sound
+      sound.currentTime = 0;
       sound.play();
+   }
 }
 
 /************************
