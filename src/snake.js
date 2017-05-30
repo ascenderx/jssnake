@@ -1,15 +1,23 @@
 // snake.js
 
+/* NOTE: getDomById() inherited from menu.js */
+
 // canvas globals
 var canvas     = domById('gc');
 var context    = canvas.getContext('2d');
 var lblScore   = domById('lblScore');
-var lblRecents = domById('lblRecents');
+var lblRecent  = domById('lblRecent');
 var lblHScore  = domById('lblHScore');
 var lblPaused  = domById('lblPaused');
+var divScore   = domById('divScore');
+var divRecent  = domById('divRecent');
+var divHScore  = domById('divHScore');
 var chkSound   = domById('chkSound');
 var chkExtra   = domById('chkExtra');
 var divExtra   = domById('divExtra');
+var chkScore   = domById('chkScore');
+var chkRecent  = domById('chkRecent');
+var chkHScore  = domById('chkHScore');
 var fps;
 
 // game globals
@@ -21,7 +29,7 @@ var dy;      // snake velocity Dy
 var mag;     // (maximum) magnitude of velocity
 var snake;   // snake body (array of blocks)
 var score;   // current score
-var recents; // recent scores
+var recent;  // most recent score
 var hScore;  // high score
 var paused;  // is the game paused?
 var doWrap;  // is wrapping allowed?
@@ -33,14 +41,6 @@ var sound5;  // 'beat high score' sound
 var sound6;  // 'wrap on' sound
 var sound7;  // 'wrap off' sound
 var sound8;  // 'score x10' sound
-
-/***********************************
- * GET DOCUMENT OBJECT MODEL BY ID *
- ***********************************/
-function domById(id)
-{
-   return document.getElementById(id);
-}
 
 /******************
  * INITIALIZATION *
@@ -54,7 +54,7 @@ window.onload = function()
    dx      = mag;
    dy      = 0;
    score   = 0;
-   recents = '';
+   recent  = 0;
    hScore  = 0;
    paused  = false;
    doWrap  = false;
@@ -73,6 +73,11 @@ window.onload = function()
    
    // enable sounds by default
    chkSound.checked = true;
+   
+   // show all scores by default
+   chkScore.checked  = false;
+   chkRecent.checked = false;
+   chkHScore.checked = false;
    
    // generate the apple
    regenApple();
@@ -232,14 +237,35 @@ function updateAll()
  ******************************/
 function printData()
 {
+   // update labels
    lblScore.innerHTML   = score;
-   lblRecents.innerHTML = recents;
+   lblRecent.innerHTML  = recent;
    lblHScore.innerHTML  = hScore;
+
    
+   // show/hide 'PAUSED'
    if (paused)
       lblPaused.innerHTML = 'PAUSED';
    else
       lblPaused.innerHTML = '';
+      
+   // show/hide current score
+   if (chkScore.checked)
+      divScore.style.display = 'block';
+   else
+      divScore.style.display = 'none';
+   
+   // show/hide recent score
+   if (chkRecent.checked)
+      divRecent.style.display = 'block';
+   else
+      divRecent.style.display = 'none';
+      
+   // show/hide high score
+   if (chkHScore.checked)
+      divHScore.style.display = 'block';
+   else
+      divHScore.style.display = 'none';
 }
 
 /*************************
@@ -351,9 +377,17 @@ function playSound(sound)
    // only play sounds if they're enabled
    if (chkSound.checked)
    {
-      // restart sound
-      sound.currentTime = 0;
-      sound.play();
+      // do not play sound while paused
+      // (unless it's the 'pause' or 'toggle wrapping' sounds)
+      if (!paused          ||
+          sound === sound4 || 
+          sound === sound6 || 
+          sound === sound7)
+      {
+         // restart sound
+         sound.currentTime = 0;
+         sound.play();
+      }
    }
 }
 
@@ -390,7 +424,7 @@ function resetScore()
    
    // update recent scores if last score was not zero
    if (score > 0)
-      recents = score + ' ' + recents;
+      recent = score;
    
    // reset current score
    score = 0

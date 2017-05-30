@@ -11,14 +11,34 @@
    </head>
    <body>
       <div id="divContent">
+         <div id="menu-link">☰</div>
+         <div id="title">JS Snake</div>
          <canvas id="gc" width="300px" height="300px"></canvas>
+         <div id="submenu">
+            <div class="button" id="btSound">
+               <input type="checkbox" id="chkSound" />
+               Enable sound
+            </div>
+            <div class="button">
+               <input type="checkbox" id="chkExtra" />
+               Show instructions
+            </div>
+            <div class="button">
+               <input type="checkbox" id="chkScore" />
+               Show current score
+            </div>
+            <div class="button">
+               <input type="checkbox" id="chkRecent" />
+               Show most recent score
+            </div>
+            <div class="button">
+               <input type="checkbox" id="chkHScore" />
+               Show high score
+            </div>
+         </div>
          <br />
          <label id="lblPaused"></label>
          <br />
-         <input type="checkbox" id="chkSound" />Enable sound
-         <br />
-         <input type="checkbox" id="chkExtra" />Show instructions
-         <br /><br />
          <div id="divExtra">
             <label class="instructions">
                You are the green snake. You are hungry for apples.<br />
@@ -42,14 +62,18 @@
             to pause
             <br /><br />
          </div>
-         Score: <label id="lblScore"></label>
-         <br />
-         Recent Scores: <label id="lblRecents"></label>
-         <br />
-         High Score: <label id="lblHScore"></label>        
-         <br /><br />
+         <div id="divScore">
+            Score: <label id="lblScore"></label>
+         </div>
+         <div id="divRecent">
+            Recent Score: <label id="lblRecent"></label>
+         </div>
+         <div id="divHScore">
+            High Score: <label id="lblHScore"></label>        
+         </div>
          <label id="lblWrap">WRAP DISABLED</label>
       </div>
+      <script type="text/javascript" src="menu.js"></script>
       <script type="text/javascript" src="src/snake.js"></script>
    </body>
 </html>

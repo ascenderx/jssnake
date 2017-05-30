@@ -2,18 +2,88 @@ body
 {
    background-color: #0f0f0f;
    color: white;
-   font-family: monospace;
-   font-size: 14px;
+   font-family: 'Terminus TTF', monospace;
+   font-size: 12px;
+}
+
+@font-face
+{
+   font-family: 'Terminus TTF';
+   src: url('../fonts/TerminusTTF-4.40.1.ttf');
+}
+
+@font-face
+{
+   font-family: 'Terminus TTF Bold';
+   src: url('../fonts/TerminusTTF-Bold-4.40.1.ttf');
+}
+
+#menu-link
+{
+   width: 20px;
+   height: 20px;
+   padding-top: 5px;
+   padding-right: 10px;
+   padding-left: 10px;
+   padding-bottom: 15px;
+   border-radius: 2px;
+   margin-bottom: 2px;
+   margin-left: 3px;
+   text-align: center;
+   cursor: pointer;
+   background-color: #2f2f2f;
+}
+
+#menu-link:hover, #menu-link:focus
+{
+   background-color: #6f6f6f;
+}
+
+#submenu
+{
+   position: absolute;
+   left: 24px;
+   top: 47px;
+   background-color: #2f2f2f;
+   text-align: left;
+   display: none;
+}
+
+.button
+{
+   font-size: 18px;
+   cursor: pointer;
+}
+
+.button:hover, .button:focus
+{
+   background-color: #6f6f6f;
 }
 
 #divContent
 {
    text-align: center;
+   border: 1px solid #2f2f2f;
+   width: 310px;
+   padding-left: 20px;
+   padding-right: 20px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   font-size: 20px;
+   position: absolute;
+   left: 10px;
+   top: 10px;
 }
 
 canvas
 {
    border: 1px solid white;
+   position: relative;
+}
+
+#divExtra
+{
+   font-size: 14px;
 }
 
 .instructions
@@ -32,7 +102,7 @@ canvas
    color: #00ff00;
 }
 
-#lblRecents
+#lblRecent
 {
    color: #ff7f00;
 }
@@ -44,8 +114,9 @@ canvas
 
 #lblPaused
 {
-   color: #ff0000;
+   color: #00ffff;
    font-size: 20px;
+   font-family: 'Terminus TTF Bold', monospace;
 }
 
 #lblWrap
