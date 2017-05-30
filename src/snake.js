@@ -32,6 +32,7 @@ var sound4;  // 'pause' sound
 var sound5;  // 'beat high score' sound
 var sound6;  // 'wrap on' sound
 var sound7;  // 'wrap off' sound
+var sound8;  // 'score x10' sound
 
 /***********************************
  * GET DOCUMENT OBJECT MODEL BY ID *
@@ -64,6 +65,7 @@ window.onload = function()
    sound5  = new Audio('wav/uphigh.wav');
    sound6  = new Audio('wav/wrapon.wav');
    sound7  = new Audio('wav/wrapoff.wav');
+   sound8  = new Audio('wav/scorex10.wav');
    
    // hide the instructions by default
    chkExtra.checked = false;
@@ -255,7 +257,12 @@ function detectCollisions()
       
       // play sound
       if (hScore == 0 || score != hScore + 1)
-         playSound(sound2);
+      {
+         if (score > 0 && (score % 10 == 0))
+            playSound(sound8);
+         else
+            playSound(sound2);
+      }
       else if (score == hScore + 1)
          playSound(sound5);
    }
