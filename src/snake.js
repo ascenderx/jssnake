@@ -18,7 +18,10 @@ var divExtra   = domById('divExtra');
 var chkScore   = domById('chkScore');
 var chkRecent  = domById('chkRecent');
 var chkHScore  = domById('chkHScore');
+var menuLink   = domById('menu-link');
+var submenu    = domById('submenu');
 var fps;
+var showMenu;
 
 // game globals
 var dim;     // snake & apple block width & height
@@ -48,24 +51,25 @@ var sound8;  // 'score x10' sound
 window.onload = function()
 {
    // initialize globals
-   fps     = 15;
-   dim     = 10;
-   mag     = dim;
-   dx      = mag;
-   dy      = 0;
-   score   = 0;
-   recent  = 0;
-   hScore  = 0;
-   paused  = false;
-   doWrap  = false;
-   sound1  = new Audio('wav/move.wav');
-   sound2  = new Audio('wav/eat2.wav');
-   sound3  = new Audio('wav/fail2.wav');
-   sound4  = new Audio('wav/pause.wav');
-   sound5  = new Audio('wav/uphigh.wav');
-   sound6  = new Audio('wav/wrapon.wav');
-   sound7  = new Audio('wav/wrapoff.wav');
-   sound8  = new Audio('wav/scorex10.wav');
+   fps      = 15;
+   dim      = 10;
+   mag      = dim;
+   dx       = mag;
+   dy       = 0;
+   score    = 0;
+   recent   = 0;
+   hScore   = 0;
+   paused   = false;
+   doWrap   = false;
+   showMenu = false;
+   sound1   = new Audio('wav/move.wav');
+   sound2   = new Audio('wav/eat2.wav');
+   sound3   = new Audio('wav/fail2.wav');
+   sound4   = new Audio('wav/pause.wav');
+   sound5   = new Audio('wav/uphigh.wav');
+   sound6   = new Audio('wav/wrapon.wav');
+   sound7   = new Audio('wav/wrapoff.wav');
+   sound8   = new Audio('wav/scorex10.wav');
    
    // hide the instructions by default
    chkExtra.checked = false;
@@ -74,10 +78,10 @@ window.onload = function()
    // enable sounds by default
    chkSound.checked = true;
    
-   // show all scores by default
+   // show/hide scores by default
    chkScore.checked  = false;
    chkRecent.checked = false;
-   chkHScore.checked = false;
+   chkHScore.checked = true;
    
    // generate the apple
    regenApple();
@@ -118,6 +122,7 @@ chkExtra.onchange = function()
  ***********************/
 lblWrap.onclick = function()
 {
+   // toggle wrap
    doWrap = !doWrap;
    
    if (doWrap)
@@ -135,6 +140,29 @@ lblWrap.onclick = function()
       
       // play sound
       playSound(sound7);
+   }
+}
+
+/***********************
+ * MENU CLICK CALLBACK *
+ ***********************/
+menuLink.onclick = function()
+{
+   // toggle menu visibility
+   showMenu = !showMenu;
+   
+   if (showMenu)
+   {  
+      // pause game
+      paused = true;
+      
+      // show menu
+      submenu.style.display = 'block';
+   }
+   else // !showMenu
+   {
+      // hide menu
+      submenu.style.display = 'none';
    }
 }
 
@@ -437,4 +465,12 @@ function randomize(minimum, maximum, modulus)
 {
    var num = Math.random() * (maximum - minimum) + minimum;
    return parseInt(num / modulus) * modulus;
+}
+
+/***********************************
+ * GET DOCUMENT OBJECT MODEL BY ID *
+ ***********************************/
+function domById(id)
+{
+   return document.getElementById(id);
 }
