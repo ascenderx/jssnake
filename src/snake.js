@@ -79,7 +79,7 @@ window.onload = function()
    chkSound.checked = true;
    
    // show/hide scores by default
-   chkScore.checked  = false;
+   chkScore.checked  = true;
    chkRecent.checked = false;
    chkHScore.checked = true;
    
@@ -154,7 +154,7 @@ menuLink.onclick = function()
    if (showMenu)
    {  
       // pause game
-      paused = true;
+      togglePause(true);
       
       // show menu
       submenu.style.display = 'block';
@@ -241,10 +241,7 @@ document.onkeydown = function(event)
       case 80:
       // pause / break
       case 19:
-         paused = !paused;
-         
-         // play sound
-         playSound(sound4);
+         togglePause();
          break;
    }
 }
@@ -456,6 +453,25 @@ function resetScore()
    
    // reset current score
    score = 0
+}
+
+/****************
+ * TOGGLE PAUSE *
+ ****************/
+function togglePause(state)
+{
+   var oldState = paused;
+   
+   // if no state specified, then simply toggle
+   if (state == null || state == undefined)
+      paused = !paused;
+   // otherwise, set state
+   else
+      paused = state;
+         
+   // play sound (if not redundant)
+   if (oldState != paused)
+      playSound(sound4);
 }
 
 /***************************
