@@ -1,7 +1,5 @@
 // snake.js
 
-/* NOTE: getDomById() inherited from menu.js */
-
 // canvas globals
 var canvas     = domById('gc');
 var context    = canvas.getContext('2d');
@@ -54,13 +52,6 @@ window.onload = function()
    fps      = 15;
    dim      = 10;
    mag      = dim;
-   dx       = mag;
-   dy       = 0;
-   score    = 0;
-   recent   = 0;
-   hScore   = 0;
-   paused   = false;
-   doWrap   = false;
    showMenu = false;
    sound1   = new Audio('wav/move.wav');
    sound2   = new Audio('wav/eat2.wav');
@@ -83,12 +74,9 @@ window.onload = function()
    chkRecent.checked = false;
    chkHScore.checked = true;
    
-   // generate the apple
-   regenApple();
-   
-   // generate the snake
-   regenSnake();
-   
+   // get data from local storage
+   loadData();
+
    // run the loop
    setInterval(function()
    {
@@ -110,6 +98,132 @@ window.onload = function()
 }
 
 /*************************
+ * WINDOW UNLOAD CAPTURE *
+ *************************/
+window.onbeforeunload = function()
+{
+    // save user data
+    saveData();
+}
+
+/***************************
+ * RESET / INITIALIZE DATA *
+ ***************************/
+function resetData()
+{
+    // intialize data
+    dx       = mag;
+    dy       = 0;
+    score    = 0;
+    recent   = 0;
+    hScore   = 0;
+    paused   = false;
+    doWrap   = false;
+
+    // generate the apple
+    regenApple();
+
+    // generate the snake
+    regenSnake();
+}
+
+/********************************
+ * LOAD DATA FROM LOCAL STORAGE *
+ ********************************/
+function loadData()
+{
+    /***************
+     * GET INTEGER *
+     ***************/
+    function getInt(name)
+    {
+        return parseInt(localStorage.getItem(name));
+    }
+
+    /***************
+     * GET BOOLEAN *
+     ***************/
+    function getBool(name)
+    {
+        var data = getInt(name);
+        if (data !== 0 && data !== null && data != undefined && !isNaN(data))
+            return true;
+        else
+            return false;
+    }
+ 
+    // if local data exists, then get it
+    if (getBool('data') === true)
+    {
+        // parse data
+        ax     = getInt('ax');
+        ay     = getInt('ay');
+        dx     = getInt('dx');
+        dy     = getInt('dy');
+        score  = getInt('score');
+        recent = getInt('recent');
+        hScore = getInt('hScore');
+        paused = getBool('paused');
+        doWrap = getBool('doWrap');
+        
+        // parse snake dataa
+        var length = getInt('length');
+        snake = [];
+        for (var i = 0; i < length; i++)
+        {
+            var sx  = getInt('snake' + i + 'x');
+            var sy  = getInt('snake' + i + 'y');
+            snake.push({x: sx, y: sy}); 
+        }
+    }
+    // otherwise, initialize it
+    else
+        resetData();
+}
+
+/******************************
+ * SAVE DATA TO LOCAL STORAGE *
+ ******************************/
+function saveData()
+{
+    /***********
+     * SET INT *
+     ***********/
+    function setInt(name, data)
+    {
+        // if a boolean or other, convert to an int
+        if (data === true)
+            data = 1;
+        else if (data === false)
+            data = 0;
+
+        // otherwise set it normally
+        if (data !== null && data !== undefined && !isNaN(data))
+            localStorage.setItem(name, data);
+    }
+
+    // set data
+    setInt('data',   true);
+    setInt('ax',     ax);
+    setInt('ay',     ay);
+    setInt('dx',     dx);
+    setInt('dy',     dy);
+    setInt('score',  score);
+    setInt('recent', recent);
+    setInt('hScore', hScore);
+    setInt('paused', paused);
+    setInt('doWrap', doWrap);
+    
+    // set snake data
+    setInt('length', snake.length);
+    for (var i = 0; i < snake.length; i++)
+    {
+        setInt('snake' + i + 'x', snake[i].x);
+        setInt('snake' + i + 'y', snake[i].y);
+    }
+}
+
+/*************************
  * SHOW/HIDE EXTRA DATA  *
  *************************/
 chkExtra.onchange = function()
@@ -122,25 +236,15 @@ chkExtra.onchange = function()
  ***********************/
 lblWrap.onclick = function()
 {
-   // toggle wrap
-   doWrap = !doWrap;
-   
-   if (doWrap)
-   {
-      lblWrap.style.color = '#00ff00';
-      lblWrap.innerHTML   = 'WRAP ENABLED';
-      
-      // play sound
-      playSound(sound6);
-   }
-   else
-   {
-      lblWrap.style.color = '#0f0f0f';
-      lblWrap.innerHTML   = 'WRAP DISABLED';
-      
-      // play sound
-      playSound(sound7);
-   }
+   toggleWrap();
+}
+
+/**************************
+ * TOGGLE PAUSE (CLICKED) *
+ **************************/
+lblPaused.onclick = function()
+{
+    togglePause();
 }
 
 /***********************
@@ -243,6 +347,15 @@ document.onkeydown = function(event)
       case 19:
          togglePause();
          break;
+       
+      // k
+      case 75:
+         if (confirm('Are you sure you want to reset?') == true)
+         {
+            resetData();
+            playSound(sound3);
+         }
+         break;
    }
 }
 
@@ -266,14 +379,19 @@ function printData()
    lblScore.innerHTML   = score;
    lblRecent.innerHTML  = recent;
    lblHScore.innerHTML  = hScore;
-
    
    // show/hide 'PAUSED'
    if (paused)
+   {
       lblPaused.innerHTML = 'PAUSED';
+      lblPaused.style.color = '#00ffff';
+   }
    else
-      lblPaused.innerHTML = '';
-      
+   {
+      lblPaused.innerHTML = 'RUNNING';
+      lblPaused.style.color = '#2f2f2f';
+   }
+   
    // show/hide current score
    if (chkScore.checked)
       divScore.style.display = 'block';
@@ -291,6 +409,18 @@ function printData()
       divHScore.style.display = 'block';
    else
       divHScore.style.display = 'none';
+
+   // show/hide wrap label
+   if (doWrap)
+   {
+      lblWrap.style.color = '#00ff00';
+      lblWrap.innerHTML   = 'WRAP ENABLED';
+   }   
+   else
+   {
+      lblWrap.style.color = '#0f0f0f';
+      lblWrap.innerHTML   = 'WRAP DISABLED';
+   }
 }
 
 /*************************
@@ -463,15 +593,36 @@ function togglePause(state)
    var oldState = paused;
    
    // if no state specified, then simply toggle
-   if (state == null || state == undefined)
+   if (state === null || state === undefined)
       paused = !paused;
-   // otherwise, set state
+   // otherwise, set the state
    else
       paused = state;
          
    // play sound (if not redundant)
-   if (oldState != paused)
+   if (oldState !== paused)
       playSound(sound4);
+}
+
+/***************
+ * TOGGLE WRAP *
+ ***************/
+function toggleWrap(state)
+{
+   var oldState = doWrap;
+   
+   // if no state specified, then simply toggle
+   if (state === null || state === undefined)
+      doWrap = !doWrap;
+   // otherwise, set the state
+   else
+      doWrap = state;
+
+   // play sound
+   if (doWrap)
+      playSound(sound6);
+   else
+      playSound(sound7);
 }
 
 /***************************
