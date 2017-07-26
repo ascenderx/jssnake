@@ -3,7 +3,10 @@
    <head>
       <title>Snake</title>
       <meta charset="UTF-8" />
-      <link rel="stylesheet" href="src/snake.css" />
+      <link rel="stylesheet"
+            href="src/snake.css" />
+      <meta name="viewport"
+            content="width=device-width, initial-scale=1.25">
       <!--
          This code inspired by Gamkedo:
          https://youtu.be/xGmXxpIj6vs
@@ -13,30 +16,77 @@
       <div id="divContent">
          <div id="menu-link">☰</div>
          <div id="title">JS Snake</div>
-         <canvas id="gc" width="300px" height="300px"></canvas>
+         <canvas id="gc"
+                 width="300px"
+                 height="300px">
+         </canvas>
          <div id="submenu">
-            <div class="button" id="btSound">
-               <input type="checkbox" id="chkSound" />
+            <div class="button"
+                 id="btSound">
+               <input type="checkbox"
+                      id="chkSound" />
                Enable sound
             </div>
             <div class="button">
-               <input type="checkbox" id="chkExtra" />
+               <input type="checkbox"
+                      id="chkExtra" />
                Show instructions
             </div>
             <div class="button">
-               <input type="checkbox" id="chkScore" />
+               <input type="checkbox"
+                      id="chkScore" />
                Show current score
             </div>
             <div class="button">
-               <input type="checkbox" id="chkRecent" />
+               <input type="checkbox"
+                      id="chkRecent" />
                Show most recent score
             </div>
             <div class="button">
-               <input type="checkbox" id="chkHScore" />
+               <input type="checkbox"
+                      id="chkHScore" />
                Show high score
             </div>
          </div>
          <br />
+         <div id="divButtons">
+            <table>
+               <!--
+               <tr>
+                  <td></td>
+                  <td>
+                     <button id="btUp">&uarr;</button>
+                  </td>
+                  <td></td>
+               </tr>
+               <tr>
+                  <td>
+                     <button id="btLeft">&larr;</button>
+                  </td>
+                  <td>
+                     <button id="btPause">P</button>
+                  </td>
+                  <td>
+                     <button id="btRight">&rarr;</button>
+                  </td>
+               </tr>
+               <tr>
+                  <td></td>
+                  <td>
+                     <button id="btDown">&darr;</button>
+                  </td>
+                  <td></td>
+               </tr>
+               -->
+               <button id="btUp">&uarr;</button>
+               <br />
+               <button id="btLeft">&larr;</button>
+               <button id="btPause">P</button>
+               <button id="btRight">&rarr;</button>
+               <br />
+               <button id="btDown">&darr;</button>
+            </table>
+         </div>
          <label id="lblPaused"></label>
          <br />
          <div id="divExtra">

@@ -1,27 +1,39 @@
 // snake.js
 
-// canvas globals
-var canvas     = domById('gc');
-var context    = canvas.getContext('2d');
-var lblScore   = domById('lblScore');
-var lblRecent  = domById('lblRecent');
-var lblHScore  = domById('lblHScore');
-var lblPaused  = domById('lblPaused');
-var divScore   = domById('divScore');
-var divRecent  = domById('divRecent');
-var divHScore  = domById('divHScore');
-var chkSound   = domById('chkSound');
-var chkExtra   = domById('chkExtra');
-var divExtra   = domById('divExtra');
-var chkScore   = domById('chkScore');
-var chkRecent  = domById('chkRecent');
-var chkHScore  = domById('chkHScore');
-var menuLink   = domById('menu-link');
-var submenu    = domById('submenu');
-var fps;
-var showMenu;
+// enforce explicit syntax
+'use strict';
 
-// game globals
+/******************
+ * CANVAS GLOBALS *
+ ******************/
+const canvas     = domById('gc');
+const context    = canvas.getContext('2d');
+const btUp       = domById('btUp');
+const btLeft     = domById('btLeft');
+const btPaused   = domById('btPause');
+const btRight    = domById('btRight');
+const btDown     = domById('btDown');
+const lblScore   = domById('lblScore');
+const lblRecent  = domById('lblRecent');
+const lblHScore  = domById('lblHScore');
+const lblPaused  = domById('lblPaused');
+const divScore   = domById('divScore');
+const divRecent  = domById('divRecent');
+const divHScore  = domById('divHScore');
+const chkSound   = domById('chkSound');
+const chkExtra   = domById('chkExtra');
+const divExtra   = domById('divExtra');
+const chkScore   = domById('chkScore');
+const chkRecent  = domById('chkRecent');
+const chkHScore  = domById('chkHScore');
+const menuLink   = domById('menu-link');
+const submenu    = domById('submenu');
+var   fps;
+var   showMenu;
+
+/****************
+ * GAME GLOBALS *
+ ****************/
 var dim;     // snake & apple block width & height
 var ax;      // apple position X
 var ay;      // apple position Y
@@ -450,7 +462,7 @@ function detectCollisions()
    
    // if snake eats itself, shrink it back to beginning size
    var sl = snake.length - 1;
-   for (i = 1; i < sl; i++)
+   for (var i = 1; i < sl; i++)
    {
       if (snake[sl].x == snake[i].x && snake[sl].y == snake[i].y)
       {
@@ -517,7 +529,7 @@ function drawAll()
    context.fillRect(ax, ay, dim, dim);
 
    // draw the snake
-   for (i = 0; i < snake.length; i++)
+   for (var i = 0; i < snake.length; i++)
    {
       context.fillStyle = "#00ff00";
       context.fillRect(snake[i].x, snake[i].y, dim, dim);

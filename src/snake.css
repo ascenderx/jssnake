@@ -60,6 +60,17 @@ body
    background-color: #6f6f6f;
 }
 
+#divButtons
+{
+   text-align: center;
+   display: none;
+}
+
+table
+{
+   width: 100%;
+}
+
 #divContent
 {
    text-align: center;
