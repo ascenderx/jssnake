@@ -1,6 +1,7 @@
 var FPS        = 60;
 var DELAY      = 4; 
 var MIN_LENGTH = 3;
+var POINT_SPEC = 10;
 
 function init() {
 	var cvs = {
@@ -36,6 +37,7 @@ function init() {
 	game.apple  = apple;
 	game.timer  = 0;
 	game.paused = false;
+	game.points = 0;
 }
 
 function togglePause(state) {
@@ -48,30 +50,33 @@ function togglePause(state) {
 
 function input() {
 	var snake = game.snake;
-	if (keys['ArrowUp']) {
-		if (snake.direction != dirs.DOWN) {
+	snake.isHorizontal = (
+		snake.direction == dirs.RIGHT || snake.direction == dirs.LEFT
+	);
+	snake.isVertical = (
+		snake.direction == dirs.DOWN || snake.direction == dirs.UP
+	);
+	
+	if (!snake.isVertical) {
+		if (keys['ArrowUp']) {
 			snake.direction = dirs.UP;
 			playSound('move');
-		}
-		releaseKey('ArrowUp');
-	} else if (keys['ArrowDown']) {
-		if (snake.direction != dirs.UP) {
+			releaseKey('ArrowUp');
+		} else if (keys['ArrowDown']) {
 			snake.direction = dirs.DOWN;
 			playSound('move');
+			releaseKey('ArrowDown');
 		}
-		releaseKey('ArrowDown');
-	} else if (keys['ArrowLeft']) {
-		if (snake.direction != dirs.RIGHT) {
+	} else if (!snake.isHorizontal) {
+		if (keys['ArrowLeft']) {
 			snake.direction = dirs.LEFT;
 			playSound('move');
-		}
-		releaseKey('ArrowLeft');
-	} else if (keys['ArrowRight']) {
-		if (snake.direction != dirs.LEFT) {
+			releaseKey('ArrowLeft');
+		} else if (keys['ArrowRight']) {
 			snake.direction = dirs.RIGHT;
 			playSound('move');
+			releaseKey('ArrowRight');
 		}
-		releaseKey('ArrowRight');
 	}
 	
 	if (keys['p']) {
@@ -87,6 +92,21 @@ function collide() {
 	var bg    = game.bg;
 	var w     = config.block.width;
 	var h     = config.block.height;
+	var head  = snake.blocks[0];
+	
+	if (snake.blocks.length > MIN_LENGTH) {
+		loopBlocks: for (var b = 1; b < snake.blocks.length; b++) {
+			var block = snake.blocks[b];
+			if (block.x == head.x && block.y == head.y) {
+				bg.draw();
+				apple.reinit();
+				snake.reset();
+				playSound('fail');
+				break loopBlocks;
+			}
+		}
+	}
+	
 	if (snake.head.x + w > bg.width) {
 		var newX = 0;
 		var newY = snake.head.y;
@@ -108,7 +128,11 @@ function collide() {
 	}
 	
 	if (snake.head.x == apple.x && snake.head.y == apple.y) {
-		playSound('eat');
+		if (++game.points % POINT_SPEC == 0) {
+			playSound('scorex10');
+		} else {
+			playSound('eat');
+		}
 		snake.add();
 		apple.reinit();
 	}

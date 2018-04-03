@@ -13,8 +13,14 @@ var dirs = {
 	DOWN:  3,
 };
 
+var ends = {
+	HEAD: 0,
+	TAIL: 1,
+};
+
 function Snake(x, y, length) {
 	var w = config.block.width;
+	this.minLength = length;
 	
 	this.blocks = [];
 	for (var b = 0; b < length; b++) {
@@ -32,45 +38,84 @@ Snake.prototype.setContext = function(ctx) {
 	this.ctx = ctx;
 };
 
+Snake.prototype.reset = function() {
+	while (this.blocks.length > this.minLength) {
+		this.blocks.pop();
+	}
+};
+
 Snake.prototype.setClearColor = function(color) {
 	this.clearColor = color;
 };
 
-Snake.prototype.add = function() {
-	this.head = this.blocks.first();
+Snake.prototype.add = function(end) {
+	/* TODO: Consolidate */
+	
+	var block;
+	if (end == ends.HEAD) {
+		block = this.blocks.first();
+	} else {
+		block = this.blocks.last();
+	}
+	
 	var point = {};
 	var w = config.block.width;
 	var h = config.block.height;
 	switch (this.direction) {
 		case dirs.RIGHT:
-			point.x = this.head.x + w;
-			point.y = this.head.y;
+			point.x = block.x;
+			if (end == ends.HEAD) {
+				point.x += w;
+			} else {
+				point.x -= w;
+			}
+			point.y = block.y;
 			break;
 		case dirs.LEFT:
-			point.x = this.head.x - w;
-			point.y = this.head.y;
+			point.x = block.x;
+			if (end == ends.HEAD) {
+				point.x -= w;
+			} else {
+				point.x += w;
+			}
+			point.y = block.y;
 			break;
 		case dirs.UP:
-			point.x = this.head.x;
-			point.y = this.head.y - h;
+			point.x = block.x;
+			point.y = block.y;
+			if (end == ends.HEAD) {
+				point.y -= h;
+			} else {
+				point.y += h;
+			}
 			break;
 		case dirs.DOWN:
-			point.x = this.head.x;
-			point.y = this.head.y + h;
+			point.x = block.x;
+			point.y = block.y;
+			if (end == ends.HEAD) {
+				point.y += h;
+			} else {
+				point.y -= h;
+			}
 			break;
 		default:
 			throw('Unknown direction "' + this.direction + '"');
 	}
-	// add the new block and update the head
-	this.blocks.unshift(point);
-	this.head = point;
+	// add the new block and update the head/tail
+	if (end == ends.HEAD) {
+		this.blocks.unshift(point);
+		this.head = point;
+	} else {
+		this.blocks.push(point);
+		this.tail = point;
+	}
 };
 
 Snake.prototype.update = function() {
 	// mimic movement by popping off of the tail
 	// and adding a block to the head
 	this.tail = this.blocks.pop();
-	this.add();
+	this.add(ends.HEAD);
 };
 
 Snake.prototype.wrap = function(newX, newY) {
