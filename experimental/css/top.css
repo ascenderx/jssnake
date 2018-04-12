@@ -1,0 +1,33 @@
+@font-face {
+   font-family: 'Press Start 2P Regular';
+   src: url('../fonts/PressStart2P-Regular.ttf');
+}
+
+body {
+	background-color: #000;
+	color: #fff;
+}
+
+canvas {
+	border: 1px solid #555;
+}
+
+.score-board {
+	font-family: 'Press Start 2P Regular', monospace;
+}
+
+.score-board td {
+	padding-right: 20px;
+}
+
+.score {
+	color: #0af;
+}
+
+.score-blink1 {
+	color: #f70;
+}
+
+.score-blink2 {
+	color: #ff0;
+}
