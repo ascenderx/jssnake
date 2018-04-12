@@ -2,7 +2,6 @@ var config = {
 	block: {
 		width:  10,
 		height: 10,
-		color:  '#0f0',
 	},
 };
 
@@ -32,6 +31,7 @@ function Snake(x, y, length) {
 	this.tail = this.blocks.last();
 	this.head = this.blocks.first();
 	this.direction = dirs.RIGHT;
+	this.oldBlock = null;
 }
 
 Snake.prototype.setContext = function(ctx) {
@@ -44,78 +44,50 @@ Snake.prototype.reset = function() {
 	}
 };
 
+Snake.prototype.setColor = function(color) {
+	this.color = color;
+}
+
 Snake.prototype.setClearColor = function(color) {
 	this.clearColor = color;
 };
 
-Snake.prototype.add = function(end) {
-	/* TODO: Consolidate */
-	
-	var block;
-	if (end == ends.HEAD) {
-		block = this.blocks.first();
-	} else {
-		block = this.blocks.last();
-	}
-	
-	var point = {};
+Snake.prototype.add = function() {
+	var block = {};
+	var head = this.head;
 	var w = config.block.width;
 	var h = config.block.height;
+	
 	switch (this.direction) {
 		case dirs.RIGHT:
-			point.x = block.x;
-			if (end == ends.HEAD) {
-				point.x += w;
-			} else {
-				point.x -= w;
-			}
-			point.y = block.y;
+			block.x = head.x + w;
+			block.y = head.y;
 			break;
 		case dirs.LEFT:
-			point.x = block.x;
-			if (end == ends.HEAD) {
-				point.x -= w;
-			} else {
-				point.x += w;
-			}
-			point.y = block.y;
+			block.x = head.x - w;
+			block.y = head.y;
 			break;
 		case dirs.UP:
-			point.x = block.x;
-			point.y = block.y;
-			if (end == ends.HEAD) {
-				point.y -= h;
-			} else {
-				point.y += h;
-			}
+			block.x = head.x;
+			block.y = head.y - h;
 			break;
 		case dirs.DOWN:
-			point.x = block.x;
-			point.y = block.y;
-			if (end == ends.HEAD) {
-				point.y += h;
-			} else {
-				point.y -= h;
-			}
+			block.x = head.x;
+			block.y = head.y + h
 			break;
 		default:
 			throw('Unknown direction "' + this.direction + '"');
 	}
-	// add the new block and update the head/tail
-	if (end == ends.HEAD) {
-		this.blocks.unshift(point);
-		this.head = point;
-	} else {
-		this.blocks.push(point);
-		this.tail = point;
-	}
+	this.blocks.unshift(block);
+	this.head = block;
 };
 
 Snake.prototype.update = function() {
 	// mimic movement by popping off of the tail
 	// and adding a block to the head
-	this.tail = this.blocks.pop();
-	this.add(ends.HEAD);
+	this.tail = this.blocks.last();
+	this.blocks.pop();
+	this.add();
 };
 
 Snake.prototype.wrap = function(newX, newY) {
@@ -123,18 +95,27 @@ Snake.prototype.wrap = function(newX, newY) {
 	this.head.y = newY;
 };
 
-Snake.prototype.draw = function() {
+Snake.prototype.drawBlock = function(x, y, color) {
 	var w = config.block.width;
 	var h = config.block.height;
 	
+	this.ctx.fillStyle = color || this.color;
+	this.ctx.fillRect(x, y, w, h);
+};
+
+Snake.prototype.draw = function() {
 	// we only need to redraw the tail onto the head
 	// the rest of the snake doesn't change
 	
 	// draw the new head
-	this.ctx.fillStyle = config.block.color;
-	this.ctx.fillRect(this.head.x, this.head.y, w, h);
+	this.drawBlock(this.head.x, this.head.y);
 	
 	// erase the old tail
-	this.ctx.fillStyle = this.clearColor;
-	this.ctx.fillRect(this.tail.x, this.tail.y, w, h);
+	this.drawBlock(this.tail.x, this.tail.y, this.clearColor);
+	
+	// draw over any blocks, if needed
+	if (this.oldBlock) {
+		this.drawBlock(this.oldBlock.x, this.oldBlock.y);
+		this.oldBlock = null;
+	}
 };

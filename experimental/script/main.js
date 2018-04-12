@@ -18,6 +18,7 @@ function init() {
 	var y  = cvs.height / 2;
 	var snake = new Snake(x, y, MIN_LENGTH);
 	snake.setContext(cvs.ctx);
+	snake.setColor('#0f0');
 	snake.setClearColor(bg.color);
 	
 	game.topLeft = {x: 0, y: 0};
@@ -133,7 +134,9 @@ function collide() {
 		} else {
 			playSound('eat');
 		}
+		
 		snake.add();
+		snake.oldBlock = {x: apple.x, y: apple.y};
 		apple.reinit();
 	}
 }
