@@ -7,6 +7,7 @@ function gel(id) {
 const game      = {};
 const lblScore  = gel('lbl-score');
 const lblHScore = gel('lbl-hscore');
+const tdScore   = gel('td-score');
 const tdHScore  = gel('td-hscore');
 
 function Background(cvs) {
@@ -37,6 +38,7 @@ function Oscillator() {
 	var oscillations = 0;
 	var maxOscillations = 10;
 	var active = false;
+	var className = null;
 	
 	this.getMaxOscillations = function() {
 		return maxOscillations;
@@ -62,6 +64,14 @@ function Oscillator() {
 		return timer;
 	};
 	
+	this.getClass = function() {
+		return className;
+	};
+	
+	this.setClass = function(c) {
+		className = c;
+	}
+	
 	this.isActive = function() {
 		return active;
 	};
@@ -74,6 +84,7 @@ function Oscillator() {
 		active = false;
 		oscillations = 0;
 		timer = 0;
+		className = null;
 	};
 	
 	this.reset = function() {

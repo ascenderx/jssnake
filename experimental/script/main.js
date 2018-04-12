@@ -143,12 +143,15 @@ function collide() {
 	
 	if (snake.head.x == apple.x && snake.head.y == apple.y) {
 		if (++game.score % POINT_SPEC == 0) {
+			game.oscill.setClass('pointspec');
+			game.oscill.activate();
 			playSound('scorex10');
 		} else {
 			playSound('eat');
 		}
 		
 		if ((game.score == game.oScore + 1) && (game.oScore > 0)) {
+			game.oscill.setClass('uphigh');
 			game.oscill.activate();
 			playSound('uphigh');
 		}
@@ -174,17 +177,38 @@ function draw() {
 	game.snake.draw();
 	game.apple.draw();
 	
-	if (game.oscill.isActive()) {
-		if (game.oscill.getState()) {
-			lblHScore.style.color = '#ff0';
-			tdHScore.style.color  = '#ff0';
+	/* TODO: Consolidate */
+	if (game.oscill.getClass() == 'uphigh') {
+		if (game.oscill.isActive()) {
+			if (game.oscill.getState()) {
+				lblHScore.style.color = '#ff0';
+				tdHScore.style.color  = '#ff0';
+			} else {
+				lblHScore.style.color = '#f70';
+				tdHScore.style.color  = '#f70';
+			}
 		} else {
-			lblHScore.style.color = '#f70';
-			tdHScore.style.color  = '#f70';
+			lblHScore.style.color = '#0af'; 
+			tdHScore.style.color  = '#fff';
+		}
+	} else if (game.oscill.getClass() == 'pointspec') {
+		if (game.oscill.isActive()) {
+			if (game.oscill.getState()) {
+				lblScore.style.color = '#0af';
+				tdScore.style.color  = '#0af';
+			} else {
+				lblScore.style.color = '#0ff';
+				tdScore.style.color  = '#0ff';
+			}
+		} else {
+			lblScore.style.color = '#0af'; 
+			tdScore.style.color  = '#fff';
 		}
 	} else {
 		lblHScore.style.color = '#0af'; 
 		tdHScore.style.color  = '#fff';
+		lblScore.style.color = '#0af'; 
+		tdScore.style.color  = '#fff';
 	}
 }
 
