@@ -23,7 +23,7 @@ function init() {
 	
 	var hScore = getLocalStorage('hScore');
 	if (hScore === undefined || hScore === null || isNaN(hScore)) {
-		updateLocalStorage({'hScore', 0});
+		updateLocalStorage({'hScore': 0});
 		hScore = 0;
 	}
 	
@@ -201,7 +201,7 @@ function collide() {
 		}
 		if (game.score > game.hScore) {
 			game.hScore = game.score;
-			updateLocalStorage({'hScore', game.hScore});
+			updateLocalStorage({'hScore': game.hScore});
 		}
 		
 		snake.add();
