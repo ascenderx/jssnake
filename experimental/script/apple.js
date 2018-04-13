@@ -20,10 +20,19 @@ Apple.prototype.draw = function() {
 	this.drawn = true;
 };
 
-Apple.prototype.reinit = function() {
+Apple.prototype.reinit = function(blocksToAvoid) {
 	var w = config.block.width;
 	var h = config.block.height;
-	var point = randomPoint(game.topLeft, game.bottomRight, w, h);
+	var point;
+	var collides = true;
+	while (collides) {
+		point = randomPoint(game.topLeft, game.bottomRight, w, h);
+		blocksToAvoid.forEach(function(block) {
+			if (block.x != point.x || block.y != point.y) {
+				collides = false;
+			}
+		});
+	}
 	this.x = point.x;
 	this.y = point.y;
 	this.drawn = false;

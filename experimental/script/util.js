@@ -1,3 +1,9 @@
+'use strict';
+
+function gel(id) {
+	return document.getElementById(id);
+}
+
 Array.prototype.first = function() {
 	return this[0];
 };

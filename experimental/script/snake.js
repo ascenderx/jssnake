@@ -17,21 +17,27 @@ var ends = {
 	TAIL: 1,
 };
 
-function Snake(x, y, length) {
-	var w = config.block.width;
-	this.minLength = length;
+function Snake(x, y, len) {
+	this.construct = function(snakeobj, x, y, length) {
+		var w = config.block.width;
+		snakeobj.minLength = length;
+		snakeobj.defaultX = x;
+		snakeobj.defaultY = y;
+
+		snakeobj.blocks = [];
+		for (var b = 0; b < length; b++) {
+			snakeobj.blocks.push({
+				x: x + w * b,
+				y: y
+			});
+		}
+		snakeobj.tail = snakeobj.blocks.last();
+		snakeobj.head = snakeobj.blocks.first();
+		snakeobj.direction = dirs.RIGHT;
+		snakeobj.oldBlock = null;
+	};
 	
-	this.blocks = [];
-	for (var b = 0; b < length; b++) {
-		this.blocks.push({
-			x: x + w * b,
-			y: y
-		});
-	}
-	this.tail = this.blocks.last();
-	this.head = this.blocks.first();
-	this.direction = dirs.RIGHT;
-	this.oldBlock = null;
+	this.construct(this, x, y, len);
 }
 
 Snake.prototype.setContext = function(ctx) {
@@ -39,9 +45,10 @@ Snake.prototype.setContext = function(ctx) {
 };
 
 Snake.prototype.reset = function() {
-	while (this.blocks.length > this.minLength) {
+	while (this.blocks.length > 0) {
 		this.blocks.pop();
 	}
+	this.construct(this, this.defaultX, this.defaultY, this.minLength);
 };
 
 Snake.prototype.setColor = function(color) {

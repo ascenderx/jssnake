@@ -6,14 +6,11 @@
 body {
 	background-color: #000;
 	color: #fff;
+	font-family: 'Press Start 2P Regular', monospace;
 }
 
 canvas {
 	border: 1px solid #555;
-}
-
-.score-board {
-	font-family: 'Press Start 2P Regular', monospace;
 }
 
 .score-board td {
@@ -30,4 +27,14 @@ canvas {
 
 .score-blink2 {
 	color: #ff0;
+}
+
+#td-paused {
+	color: #f00;
+	display: none;
+}
+
+#td-wrapping {
+	color: #0f0;
+	display: none;
 }

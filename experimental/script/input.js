@@ -13,10 +13,10 @@ function releaseKey(key) {
     }
 }
 
-function cbKeyPress(event) {
+window.addEventListener('keydown', function(event) {
 	setKey(event.key);
-}
+});
 
-function cbKeyRelease(event) {
+window.addEventListener('keyup', function(event) {
 	releaseKey(event.key);
-}
+});

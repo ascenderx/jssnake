@@ -1,8 +1,3 @@
-var FPS        = 60;
-var DELAY      = 4; 
-var MIN_LENGTH = 3;
-var POINT_SPEC = 10;
-
 function init() {
 	var cvs = {
 		obj: gel('cvs')
@@ -48,6 +43,7 @@ function init() {
 	game.hScore = hScore;
 	game.oScore = hScore;
 	game.oscill = new Oscillator();
+	game.doWrap = false;
 }
 
 function togglePause(state) {
@@ -55,6 +51,30 @@ function togglePause(state) {
 		game.paused = state;
 	} else {
 		game.paused = !game.paused;
+	}
+	
+	if (game.paused) {
+		tdPaused.style.display = 'inline';
+	} else {
+		tdPaused.style.display = 'none';
+	}
+	
+	playSound('pause');
+}
+
+function toggleWrapping(state) {
+	if (state !== null && state !== undefined) {
+		game.doWrap = state;
+	} else {
+		game.doWrap = !game.doWrap;
+	}
+	
+	if (game.doWrap) {
+		playSound('wrapon');
+		tdWrapping.style.display = 'inline';
+	} else {
+		playSound('wrapoff');
+		tdWrapping.style.display = 'none';
 	}
 }
 
@@ -68,31 +88,54 @@ function input() {
 	);
 	
 	if (!snake.isVertical) {
-		if (keys['ArrowUp']) {
+		if (keys['ArrowUp'] || keys['w']) {
 			snake.direction = dirs.UP;
 			playSound('move');
 			releaseKey('ArrowUp');
-		} else if (keys['ArrowDown']) {
+			releaseKey('w');
+		} else if (keys['ArrowDown'] || keys['s']) {
 			snake.direction = dirs.DOWN;
 			playSound('move');
 			releaseKey('ArrowDown');
+			releaseKey('s');
 		}
 	} else if (!snake.isHorizontal) {
-		if (keys['ArrowLeft']) {
+		if (keys['ArrowLeft'] || keys['a']) {
 			snake.direction = dirs.LEFT;
 			playSound('move');
 			releaseKey('ArrowLeft');
-		} else if (keys['ArrowRight']) {
+			releaseKey('a');
+		} else if (keys['ArrowRight'] || keys['d']) {
 			snake.direction = dirs.RIGHT;
 			playSound('move');
 			releaseKey('ArrowRight');
+			releaseKey('d');
 		}
 	}
 	
 	if (keys['p']) {
 		togglePause();
-		playSound('pause');
 		releaseKey('p');
+	}
+	
+	if (keys['t']) {
+		toggleWrapping();
+		releaseKey('t');
+	}
+}
+
+function fail(doPlaySound, doResetApple) {
+	game.bg.draw();
+	game.snake.reset();
+	if (doResetApple) {
+		game.apple.reinit(game.snake.blocks);
+	}
+	if (game.score > game.oScore) {
+		game.oScore = game.score;
+	}
+	game.score = 0;
+	if (doPlaySound) {
+		playSound('fail');
 	}
 }
 
@@ -108,37 +151,45 @@ function collide() {
 		loopBlocks: for (var b = 1; b < snake.blocks.length; b++) {
 			var block = snake.blocks[b];
 			if (block.x == head.x && block.y == head.y) {
-				bg.draw();
-				apple.reinit();
-				snake.reset();
-				if (game.score > game.oScore) {
-					game.oScore = game.score;
-				}
-				game.score = 0;
-				playSound('fail');
+				fail(true);
 				break loopBlocks;
 			}
 		}
 	}
 	
-	if (snake.head.x + w > bg.width) {
-		var newX = 0;
-		var newY = snake.head.y;
-		snake.wrap(newX, newY);
-	} else if (snake.head.x < 0) {
-		var newX = bg.width;
-		var newY = snake.head.y;
-		snake.wrap(newX, newY);
-	}
+	if (game.doWrap) {
+		if (snake.head.x + w > bg.width) {
+			var newX = 0;
+			var newY = snake.head.y;
+			snake.wrap(newX, newY);
+		} else if (snake.head.x < 0) {
+			var newX = bg.width;
+			var newY = snake.head.y;
+			snake.wrap(newX, newY);
+		}
 	
-	if (snake.head.y + h > bg.height) {
-		var newX = snake.head.x;
-		var newY = 0;
-		snake.wrap(newX, newY);
-	} else if (snake.head.y < 0) {
-		var newX = snake.head.x;
-		var newY = bg.height;
-		snake.wrap(newX, newY);
+		if (snake.head.y + h > bg.height) {
+			var newX = snake.head.x;
+			var newY = 0;
+			snake.wrap(newX, newY);
+		} else if (snake.head.y < 0) {
+			var newX = snake.head.x;
+			var newY = bg.height;
+			snake.wrap(newX, newY);
+		}
+	} else {
+		if (snake.head.x + w > bg.width ||
+			snake.head.y + h > bg.height ||
+		    snake.head.x < 0 ||
+		    snake.head.y < 0) {
+			var doPlaySound  = false;
+			var doResetApple = false;
+			if (snake.blocks.length > snake.minLength) {
+				doPlaySound  = true;
+				doResetApple = true;
+			}
+			fail(doPlaySound, doResetApple);
+		}
 	}
 	
 	if (snake.head.x == apple.x && snake.head.y == apple.y) {
@@ -162,7 +213,7 @@ function collide() {
 		
 		snake.add();
 		snake.oldBlock = {x: apple.x, y: apple.y};
-		apple.reinit();
+		apple.reinit(snake.blocks);
 	}
 }
 
@@ -212,7 +263,7 @@ function draw() {
 	}
 }
 
-function cbMain() {
+window.addEventListener('load', function() {
 	init();
 	setInterval(function tick() {
 		if (game.timer % DELAY === 0) {
@@ -225,4 +276,4 @@ function cbMain() {
 		}
 		game.timer++;
 	}, 1000/FPS);
-}
+});
