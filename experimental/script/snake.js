@@ -1,10 +1,3 @@
-var config = {
-	block: {
-		width:  10,
-		height: 10,
-	},
-};
-
 var dirs = {
 	LEFT:  0,
 	UP:    1,
@@ -19,7 +12,6 @@ var ends = {
 
 function Snake(x, y, len) {
 	this.construct = function(snakeobj, x, y, length) {
-		var w = config.block.width;
 		snakeobj.minLength = length;
 		snakeobj.defaultX = x;
 		snakeobj.defaultY = y;
@@ -27,7 +19,7 @@ function Snake(x, y, len) {
 		snakeobj.blocks = [];
 		for (var b = 0; b < length; b++) {
 			snakeobj.blocks.push({
-				x: x + w * b,
+				x: x + b,
 				y: y
 			});
 		}
@@ -62,25 +54,23 @@ Snake.prototype.setClearColor = function(color) {
 Snake.prototype.add = function() {
 	var block = {};
 	var head = this.head;
-	var w = config.block.width;
-	var h = config.block.height;
 	
 	switch (this.direction) {
 		case dirs.RIGHT:
-			block.x = head.x + w;
+			block.x = head.x + 1;
 			block.y = head.y;
 			break;
 		case dirs.LEFT:
-			block.x = head.x - w;
+			block.x = head.x - 1;
 			block.y = head.y;
 			break;
 		case dirs.UP:
 			block.x = head.x;
-			block.y = head.y - h;
+			block.y = head.y - 1;
 			break;
 		case dirs.DOWN:
 			block.x = head.x;
-			block.y = head.y + h
+			block.y = head.y + 1
 			break;
 		default:
 			throw('Unknown direction "' + this.direction + '"');
@@ -103,11 +93,8 @@ Snake.prototype.wrap = function(newX, newY) {
 };
 
 Snake.prototype.drawBlock = function(x, y, color) {
-	var w = config.block.width;
-	var h = config.block.height;
-	
 	this.ctx.fillStyle = color || this.color;
-	this.ctx.fillRect(x, y, w, h);
+	this.ctx.fillRect(x * BLOCK_W, y * BLOCK_H, BLOCK_W, BLOCK_H);
 };
 
 Snake.prototype.draw = function() {

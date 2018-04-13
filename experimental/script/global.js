@@ -1,4 +1,5 @@
 var game       = {};
+var cvs        = gel('cvs');
 var lblScore   = gel('lbl-score');
 var lblHScore  = gel('lbl-hscore');
 var tdScore    = gel('td-score');
@@ -9,3 +10,7 @@ var FPS        = 60;
 var DELAY      = 4; 
 var MIN_LENGTH = 3;
 var POINT_SPEC = 10;
+var BLOCK_W    = 10;
+var BLOCK_H    = 10;
+var GRID_W     = Math.floor(cvs.width  / BLOCK_W);
+var GRID_H     = Math.floor(cvs.height / BLOCK_H);

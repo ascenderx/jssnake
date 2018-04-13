@@ -1,12 +1,12 @@
-function Background(cvs) {
-	this.ctx         = cvs.ctx;
+function Background(cvs, ctx) {
+	this.ctx         = ctx;
 	this.width       = cvs.width;
 	this.height      = cvs.height;
 	this.topLeft     = {x: 0, y: 0};
 	this.bottomRight = {
 		x: this.topLeft.x + this.width,
 		y: this.topLeft.y + this.height
-	}; 
+	};
 };
 
 Background.prototype.color = '#000';

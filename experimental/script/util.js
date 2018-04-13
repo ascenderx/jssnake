@@ -16,15 +16,33 @@ function gel(id) {
 	return document.getElementById(id);
 }
 
-function randomInt(min, max, dim) {
-	var rand = Math.random() * (max - min + 1) + min;
-	rand /= dim;
-	return dim * Math.floor(rand);
+function randomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function randomPoint(topLeft, bottomRight, skipX, skipY) {
-	var x = randomInt(topLeft.x, bottomRight.x, skipX);
-	var y = randomInt(topLeft.y, bottomRight.y, skipY);
+function randomGridPoint(tlX, tlY, brX, brY) {
+	var x = randomInt(tlX, brX);
+	var y = randomInt(tlY, brY);
 	
 	return {x: x, y: y};
+}
+
+function updateLocalStorage(obj) {
+	try {
+		for (var key in obj) {
+			window.localStorage.setItem(key, JSON.parse(obj[key]));
+		}
+	} catch (err) {
+		/* */
+	}
+}
+
+function getLocalStorage(key) {
+	var value;
+	try {
+		value = JSON.parse(window.localStorage.getItem(key));
+	} catch (err) {
+		value = null;
+	}
+	return value;
 }

@@ -1,39 +1,34 @@
 function init() {
-	var cvs = {
-		obj: gel('cvs')
-	};
-	cvs.ctx = cvs.obj.getContext('2d');
-	cvs.width = cvs.obj.width;
-	cvs.height = cvs.obj.height;
+	var ctx = cvs.getContext('2d');
 	
-	var bg = new Background(cvs);
+	var bg = new Background(cvs, ctx);
 	bg.draw();
 	
-	var x  = cvs.width  / 2;
-	var y  = cvs.height / 2;
+	var x  = GRID_W / 2;
+	var y  = GRID_H / 2;
 	var snake = new Snake(x, y, MIN_LENGTH);
-	snake.setContext(cvs.ctx);
+	snake.setContext(ctx);
 	snake.setColor('#0f0');
 	snake.setClearColor(bg.color);
 	
 	game.topLeft = {x: 0, y: 0};
 	game.bottomRight = {
-		x: bg.width  - config.block.width,
-		y: bg.height - config.block.height,
+		x: bg.width  - BLOCK_W,
+		y: bg.height - BLOCK_H,
 	};
-	var initPoint = randomPoint(game.topLeft, game.bottomRight);
 	var apple = new Apple();
-	apple.setContext(cvs.ctx);
+	apple.setContext(ctx);
 	
 	initAudio();
 	
-	var hScore = parseInt(localStorage.getItem('hScore'));
+	var hScore = getLocalStorage('hScore');
 	if (hScore === undefined || hScore === null || isNaN(hScore)) {
-		localStorage.setItem('hScore', 0);
+		updateLocalStorage({'hScore', 0});
 		hScore = 0;
 	}
 	
 	game.cvs    = cvs;
+	game.ctx    = ctx;
 	game.bg     = bg;
 	game.snake  = snake;
 	game.apple  = apple;
@@ -128,7 +123,7 @@ function fail(doPlaySound, doResetApple) {
 	game.bg.draw();
 	game.snake.reset();
 	if (doResetApple) {
-		game.apple.reinit(game.snake.blocks);
+		game.apple.construct(game.snake.blocks);
 	}
 	if (game.score > game.oScore) {
 		game.oScore = game.score;
@@ -143,8 +138,6 @@ function collide() {
 	var snake = game.snake;
 	var apple = game.apple;
 	var bg    = game.bg;
-	var w     = config.block.width;
-	var h     = config.block.height;
 	var head  = snake.blocks[0];
 	
 	if (snake.blocks.length > MIN_LENGTH) {
@@ -158,28 +151,28 @@ function collide() {
 	}
 	
 	if (game.doWrap) {
-		if (snake.head.x + w > bg.width) {
+		if (snake.head.x > GRID_W) {
 			var newX = 0;
 			var newY = snake.head.y;
 			snake.wrap(newX, newY);
 		} else if (snake.head.x < 0) {
-			var newX = bg.width;
+			var newX = GRID_W;
 			var newY = snake.head.y;
 			snake.wrap(newX, newY);
 		}
 	
-		if (snake.head.y + h > bg.height) {
+		if (snake.head.y > GRID_H) {
 			var newX = snake.head.x;
 			var newY = 0;
 			snake.wrap(newX, newY);
 		} else if (snake.head.y < 0) {
 			var newX = snake.head.x;
-			var newY = bg.height;
+			var newY = GRID_H;
 			snake.wrap(newX, newY);
 		}
 	} else {
-		if (snake.head.x + w > bg.width ||
-			snake.head.y + h > bg.height ||
+		if (snake.head.x > GRID_W ||
+			snake.head.y > GRID_H ||
 		    snake.head.x < 0 ||
 		    snake.head.y < 0) {
 			var doPlaySound  = false;
@@ -208,12 +201,12 @@ function collide() {
 		}
 		if (game.score > game.hScore) {
 			game.hScore = game.score;
-			localStorage.setItem('hScore', game.hScore);
+			updateLocalStorage({'hScore', game.hScore});
 		}
 		
 		snake.add();
 		snake.oldBlock = {x: apple.x, y: apple.y};
-		apple.reinit(snake.blocks);
+		apple.construct(snake.blocks);
 	}
 }
 

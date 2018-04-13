@@ -1,9 +1,25 @@
 function Apple() {
-	var w = config.block.width;
-	var h = config.block.height;
-	var point = randomPoint(game.topLeft, game.bottomRight, w, h);
-	this.x = point.x;
-	this.y = point.y;
+	this.construct = function(blocksToAvoid) {
+		var point;
+		var collides = true;
+		
+		if (blocksToAvoid && blocksToAvoid.length != 0) {
+			while (collides) {
+				point = randomGridPoint(1, 1, GRID_W - 2, GRID_H - 2);
+				blocksToAvoid.forEach(function(block) {
+					if (block.x != point.x || block.y != point.y) {
+						collides = false;
+					}
+				});
+			}
+		} else {
+			point = randomGridPoint(1, 1, GRID_W - 2, GRID_H - 2);
+		}
+		
+		this.x = point.x
+		this.y = point.y;
+	};
+	this.construct(null);
 }
 
 Apple.prototype.setContext = function(ctx) {
@@ -13,27 +29,7 @@ Apple.prototype.setContext = function(ctx) {
 Apple.prototype.color = '#f00';
 
 Apple.prototype.draw = function() {
-	var w = config.block.width;
-	var h = config.block.height;
 	this.ctx.fillStyle = this.color;
-	this.ctx.fillRect(this.x, this.y, w, h);
+	this.ctx.fillRect(this.x * BLOCK_W, this.y * BLOCK_H, BLOCK_W, BLOCK_H);
 	this.drawn = true;
-};
-
-Apple.prototype.reinit = function(blocksToAvoid) {
-	var w = config.block.width;
-	var h = config.block.height;
-	var point;
-	var collides = true;
-	while (collides) {
-		point = randomPoint(game.topLeft, game.bottomRight, w, h);
-		blocksToAvoid.forEach(function(block) {
-			if (block.x != point.x || block.y != point.y) {
-				collides = false;
-			}
-		});
-	}
-	this.x = point.x;
-	this.y = point.y;
-	this.drawn = false;
 };
