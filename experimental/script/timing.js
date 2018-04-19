@@ -20,7 +20,7 @@ function Oscillator() {
 	};
 	
 	this.getDelay = function() {
-		return delay;	
+		return delay;
 	};
 	
 	this.setDelay = function(d) {
@@ -37,7 +37,7 @@ function Oscillator() {
 	
 	this.setClass = function(c) {
 		className = c;
-	}
+	};
 	
 	this.isActive = function() {
 		return active;
@@ -63,7 +63,7 @@ function Oscillator() {
 			return;
 		}
 	
-		if (timer % delay == 0) {
+		if (timer % delay === 0) {
 			if (oscillations < maxOscillations) {
 				state = !state;
 				oscillations++;

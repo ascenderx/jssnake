@@ -83,24 +83,24 @@ function input() {
 	);
 	
 	if (!snake.isVertical) {
-		if (keys['ArrowUp'] || keys['w']) {
+		if (keys.ArrowUp || keys.w) {
 			snake.direction = dirs.UP;
 			playSound('move');
 			releaseKey('ArrowUp');
 			releaseKey('w');
-		} else if (keys['ArrowDown'] || keys['s']) {
+		} else if (keys.ArrowDown || keys.s) {
 			snake.direction = dirs.DOWN;
 			playSound('move');
 			releaseKey('ArrowDown');
 			releaseKey('s');
 		}
 	} else if (!snake.isHorizontal) {
-		if (keys['ArrowLeft'] || keys['a']) {
+		if (keys.ArrowLeft || keys.a) {
 			snake.direction = dirs.LEFT;
 			playSound('move');
 			releaseKey('ArrowLeft');
 			releaseKey('a');
-		} else if (keys['ArrowRight'] || keys['d']) {
+		} else if (keys.ArrowRight || keys.d) {
 			snake.direction = dirs.RIGHT;
 			playSound('move');
 			releaseKey('ArrowRight');
@@ -108,12 +108,12 @@ function input() {
 		}
 	}
 	
-	if (keys['p']) {
+	if (keys.p) {
 		togglePause();
 		releaseKey('p');
 	}
 	
-	if (keys['t']) {
+	if (keys.t) {
 		toggleWrapping();
 		releaseKey('t');
 	}
@@ -141,17 +141,17 @@ function collide() {
 	var head  = snake.blocks[0];
 	
 	if (snake.blocks.length > MIN_LENGTH) {
-		loopBlocks: for (var b = 1; b < snake.blocks.length; b++) {
+		for (var b = 1; b < snake.blocks.length; b++) {
 			var block = snake.blocks[b];
 			if (block.x == head.x && block.y == head.y) {
 				fail(true);
-				break loopBlocks;
+				break;
 			}
 		}
 	}
 	
 	if (game.doWrap) {
-		if (snake.head.x > GRID_W) {
+		if (snake.head.x >= GRID_W) {
 			var newX = 0;
 			var newY = snake.head.y;
 			snake.wrap(newX, newY);
@@ -161,7 +161,7 @@ function collide() {
 			snake.wrap(newX, newY);
 		}
 	
-		if (snake.head.y > GRID_H) {
+		if (snake.head.y >= GRID_H) {
 			var newX = snake.head.x;
 			var newY = 0;
 			snake.wrap(newX, newY);
@@ -232,7 +232,7 @@ function draw() {
 				tdHScore.style.color  = '#f70';
 			}
 		} else {
-			lblHScore.style.color = '#0af'; 
+			lblHScore.style.color = '#0af';
 			tdHScore.style.color  = '#fff';
 		}
 	} else if (game.oscill.getClass() == 'pointspec') {
@@ -245,13 +245,13 @@ function draw() {
 				tdScore.style.color  = '#0ff';
 			}
 		} else {
-			lblScore.style.color = '#0af'; 
+			lblScore.style.color = '#0af';
 			tdScore.style.color  = '#fff';
 		}
 	} else {
-		lblHScore.style.color = '#0af'; 
+		lblHScore.style.color = '#0af';
 		tdHScore.style.color  = '#fff';
-		lblScore.style.color = '#0af'; 
+		lblScore.style.color = '#0af';
 		tdScore.style.color  = '#fff';
 	}
 }

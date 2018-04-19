@@ -3,7 +3,7 @@ function Apple() {
 		var point;
 		var collides = true;
 		
-		if (blocksToAvoid && blocksToAvoid.length != 0) {
+		if (blocksToAvoid && blocksToAvoid.length !== 0) {
 			while (collides) {
 				point = randomGridPoint(1, 1, GRID_W - 2, GRID_H - 2);
 				blocksToAvoid.forEach(function(block) {
@@ -30,6 +30,10 @@ Apple.prototype.color = '#f00';
 
 Apple.prototype.draw = function() {
 	this.ctx.fillStyle = this.color;
-	this.ctx.fillRect(this.x * BLOCK_W, this.y * BLOCK_H, BLOCK_W, BLOCK_H);
+	this.ctx.fillRect(
+		this.x * BLOCK_W + 1,
+		this.y * BLOCK_H + 1,
+		BLOCK_W - 2,
+		BLOCK_H - 2);
 	this.drawn = true;
 };

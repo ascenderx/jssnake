@@ -7,7 +7,7 @@ function Background(cvs, ctx) {
 		x: this.topLeft.x + this.width,
 		y: this.topLeft.y + this.height
 	};
-};
+}
 
 Background.prototype.color = '#000';
 

@@ -45,7 +45,7 @@ Snake.prototype.reset = function() {
 
 Snake.prototype.setColor = function(color) {
 	this.color = color;
-}
+};
 
 Snake.prototype.setClearColor = function(color) {
 	this.clearColor = color;
@@ -70,7 +70,7 @@ Snake.prototype.add = function() {
 			break;
 		case dirs.DOWN:
 			block.x = head.x;
-			block.y = head.y + 1
+			block.y = head.y + 1;
 			break;
 		default:
 			throw('Unknown direction "' + this.direction + '"');
@@ -94,7 +94,12 @@ Snake.prototype.wrap = function(newX, newY) {
 
 Snake.prototype.drawBlock = function(x, y, color) {
 	this.ctx.fillStyle = color || this.color;
-	this.ctx.fillRect(x * BLOCK_W, y * BLOCK_H, BLOCK_W, BLOCK_H);
+	this.ctx.fillRect(
+         x * BLOCK_W + 1,
+         y * BLOCK_H + 1,
+         BLOCK_W - 2,
+         BLOCK_H - 2
+   );
 };
 
 Snake.prototype.draw = function() {
