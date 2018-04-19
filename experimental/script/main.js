@@ -171,8 +171,8 @@ function collide() {
 			snake.wrap(newX, newY);
 		}
 	} else {
-		if (snake.head.x > GRID_W ||
-			snake.head.y > GRID_H ||
+		if (snake.head.x >= GRID_W ||
+			snake.head.y >= GRID_H ||
 		    snake.head.x < 0 ||
 		    snake.head.y < 0) {
 			var doPlaySound  = false;
