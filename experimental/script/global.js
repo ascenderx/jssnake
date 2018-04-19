@@ -1,8 +1,10 @@
 var game       = {};
 var cvs        = gel('cvs');
 var lblScore   = gel('lbl-score');
+var lblRecent  = gel('lbl-recent');
 var lblHScore  = gel('lbl-hscore');
 var tdScore    = gel('td-score');
+var tdRecent   = gel('td-recent');
 var tdHScore   = gel('td-hscore');
 var tdPaused   = gel('td-paused');
 var tdWrapping = gel('td-wrapping');
@@ -17,9 +19,11 @@ var GRID_H     = Math.floor(cvs.height / BLOCK_H);
 var COLOR_PER  = 20;
 var COLORS = [
 	'#0f0', // green
+	/*
 	'#70f', // violet
 	'#f70', // orange
 	'#07f', // cyan
 	'#ff0', // yellow
 	'#00f', // blue
+	*/
 ];

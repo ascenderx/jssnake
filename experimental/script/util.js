@@ -37,10 +37,30 @@ function updateLocalStorage(obj) {
 	}
 }
 
+function updateSessionStorage(obj) {
+	try {
+		for (var key in obj) {
+			window.sessionStorage.setItem(key, JSON.parse(obj[key]));
+		}
+	} catch (err) {
+		/* */
+	}
+}
+
 function getLocalStorage(key) {
 	var value;
 	try {
 		value = JSON.parse(window.localStorage.getItem(key));
+	} catch (err) {
+		value = null;
+	}
+	return value;
+}
+
+function getSessionStorage(key) {
+	var value;
+	try {
+		value = JSON.parse(window.sessionStorage.getItem(key));
 	} catch (err) {
 		value = null;
 	}

@@ -24,8 +24,14 @@ function init() {
 	
 	var hScore = getLocalStorage('hScore');
 	if (hScore === undefined || hScore === null || isNaN(hScore)) {
-		updateLocalStorage({'hScore': 0});
 		hScore = 0;
+		updateLocalStorage({'hScore': hScore});
+	}
+	
+	var rScore = getSessionStorage('rScore');
+	if (rScore === undefined || rScore === null || isNaN(rScore)) {
+		rScore = 0;
+		updateSessionStorage({'rScore': rScore});
 	}
 	
 	game.cvs    = cvs;
@@ -36,10 +42,63 @@ function init() {
 	game.timer  = 0;
 	game.paused = false;
 	game.score  = 0;
+	game.rScore = rScore;
+	game.pScore = rScore;
 	game.hScore = hScore;
 	game.oScore = hScore;
-	game.oscill = new Oscillator();
+	game.osc1   = new Oscillator('uphigh');
+	game.osc2   = new Oscillator('pointspec');
+	game.osc3   = new Oscillator('beatlast');
 	game.doWrap = false;
+	
+	initCallbacks();
+}
+
+function initCallbacks() {
+	game.osc1.setCallback(function(state, oscillations) {
+		if (state) {
+			lblHScore.style.color = '#ff0';
+			tdHScore.style.color  = '#ff0';
+		} else {
+			lblHScore.style.color = '#f70';
+			tdHScore.style.color  = '#f70';
+		}
+	});
+	game.osc1.setFinalCallback(function() {
+		lblHScore.style.color = '#0af';
+		tdHScore.style.color  = '#fff';
+	});
+	game.osc1.execFinalCallback();
+	
+	game.osc2.setCallback(function(state, oscillations) {
+		if (state) {
+			lblScore.style.color = '#0af';
+			tdScore.style.color  = '#0af';
+		} else {
+			lblScore.style.color = '#0ff';
+			tdScore.style.color  = '#0ff';
+		}
+	});
+	game.osc2.setFinalCallback(function() {
+		lblScore.style.color = '#0af';
+		tdScore.style.color  = '#fff';
+	});
+	game.osc2.execFinalCallback();
+	
+	game.osc3.setCallback(function(state, oscillations) {
+		if (state) {
+			lblRecent.style.color = '#f0f';
+			tdRecent.style.color  = '#f0f';
+		} else {
+			lblRecent.style.color = '#f07';
+			tdRecent.style.color  = '#f07';
+		}
+	});
+	game.osc3.setFinalCallback(function() {
+		lblRecent.style.color = '#0af';
+		tdRecent.style.color  = '#fff';
+	});
+	game.osc3.execFinalCallback();
 }
 
 function togglePause(state) {
@@ -131,10 +190,50 @@ function fail(doPlaySound, doResetApple) {
 	if (game.score > game.oScore) {
 		game.oScore = game.score;
 	}
+	game.oScore = game.hScore;
+	game.pScore = game.rScore;
 	game.score = 0;
 	if (doPlaySound) {
 		playSound('fail');
 	}
+}
+
+function increaseScore() {
+	if (++game.score % POINT_SPEC === 0) {
+		game.osc2.activate();
+		playSound('scorex10');
+	} else {
+		playSound('eat');
+	}
+	
+	if (game.score % COLOR_PER === 0) {
+		// for every 20 points, change the color
+		game.colorI++;
+		game.colorI %= COLORS.length;
+		game.snake.setColor(COLORS[game.colorI]);
+	}
+	
+	if ((game.score == game.pScore + 1) && (game.pScore > 0)) {
+		game.osc3.activate();
+		playSound('uphigh');
+	}
+	if (game.score > game.rScore) {
+		game.rScore = game.score;
+		updateSessionStorage({'rScore': game.rScore});
+	}
+	
+	if ((game.score == game.oScore + 1) && (game.oScore > 0)) {
+		game.osc1.activate();
+		playSound('uphigh');
+	}
+	if (game.score > game.hScore) {
+		game.hScore = game.score;
+		updateLocalStorage({'hScore': game.hScore});
+	}
+	
+	game.snake.add();
+	game.snake.oldBlock = {x: game.apple.x, y: game.apple.y};
+	game.apple.construct(game.snake.blocks);
 }
 
 function collide() {
@@ -189,81 +288,23 @@ function collide() {
 	}
 	
 	if (snake.head.x == apple.x && snake.head.y == apple.y) {
-		if (++game.score % POINT_SPEC === 0) {
-			game.oscill.setClass('pointspec');
-			game.oscill.activate();
-			playSound('scorex10');
-		} else {
-			playSound('eat');
-		}
-		
-		if (game.score % COLOR_PER === 0) {
-			// for every 20 points, change the color
-			game.colorI++;
-			game.colorI %= COLORS.length;
-			snake.setColor(COLORS[game.colorI]);
-		}
-		
-		if ((game.score == game.oScore + 1) && (game.oScore > 0)) {
-			game.oscill.setClass('uphigh');
-			game.oscill.activate();
-			playSound('uphigh');
-		}
-		if (game.score > game.hScore) {
-			game.hScore = game.score;
-			updateLocalStorage({'hScore': game.hScore});
-		}
-		
-		snake.add();
-		snake.oldBlock = {x: apple.x, y: apple.y};
-		apple.construct(snake.blocks);
+		increaseScore();
 	}
 }
 
 function update() {
 	game.snake.update();
 	lblScore.innerText  = game.score  || 0;
+	lblRecent.innerText = game.rScore || 0;
 	lblHScore.innerText = game.hScore || 0;
-	game.oscill.update();
+	game.osc1.update();
+	game.osc2.update();
+	game.osc3.update();
 }
 
 function draw() {
 	game.snake.draw();
 	game.apple.draw();
-	
-	/* TODO: Consolidate */
-	if (game.oscill.getClass() == 'uphigh') {
-		if (game.oscill.isActive()) {
-			if (game.oscill.getState()) {
-				lblHScore.style.color = '#ff0';
-				tdHScore.style.color  = '#ff0';
-			} else {
-				lblHScore.style.color = '#f70';
-				tdHScore.style.color  = '#f70';
-			}
-		} else {
-			lblHScore.style.color = '#0af';
-			tdHScore.style.color  = '#fff';
-		}
-	} else if (game.oscill.getClass() == 'pointspec') {
-		if (game.oscill.isActive()) {
-			if (game.oscill.getState()) {
-				lblScore.style.color = '#0af';
-				tdScore.style.color  = '#0af';
-			} else {
-				lblScore.style.color = '#0ff';
-				tdScore.style.color  = '#0ff';
-			}
-		} else {
-			lblScore.style.color = '#0af';
-			tdScore.style.color  = '#fff';
-		}
-	} else {
-		lblHScore.style.color = '#0af';
-		tdHScore.style.color  = '#fff';
-		lblScore.style.color = '#0af';
-		tdScore.style.color  = '#fff';
-	}
 }
 
 window.addEventListener('load', function() {

@@ -1,11 +1,13 @@
-function Oscillator() {
+function Oscillator(name) {
 	var state = 0;
 	var delay = 2;
 	var timer = 0;
 	var oscillations = 0;
 	var maxOscillations = 10;
 	var active = false;
-	var className = null;
+	var className = name || null;
+	var callback = null;
+	var fcallback = null;
 	
 	this.getMaxOscillations = function() {
 		return maxOscillations;
@@ -54,6 +56,34 @@ function Oscillator() {
 		className = null;
 	};
 	
+	this.setCallback = function(cb) {
+		callback	= cb;
+	};
+	
+	this.clearCallback = function() {
+		callback = null;
+	};
+	
+	this.execCallback = function() {
+		if (callback) {
+			callback(state, oscillations);
+		}
+	};
+	
+	this.setFinalCallback = function(cb) {
+		fcallback = cb;
+	};
+	
+	this.execFinalCallback = function() {
+		if (fcallback) {
+			fcallback();
+		}
+	};
+	
+	this.clearFinalCallback = function() {
+		fcallback = null;
+	};
+	
 	this.reset = function() {
 		state = 0;
 	};
@@ -67,10 +97,12 @@ function Oscillator() {
 			if (oscillations < maxOscillations) {
 				state = !state;
 				oscillations++;
+				this.execCallback();
 			} else {
 				this.deactivate();
+				this.execFinalCallback();
 			}
 		}
 		timer++;
-	}
+	};
 }
