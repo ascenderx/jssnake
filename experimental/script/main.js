@@ -4,8 +4,8 @@ function init() {
 	var bg = new Background(cvs, ctx);
 	bg.draw();
 	
-	var x  = GRID_W / 2;
-	var y  = GRID_H / 2;
+	var x = 0;
+	var y = 0;
 	var snake = new Snake(x, y, MIN_LENGTH);
 	snake.setContext(ctx);
 	snake.setColor('#0f0');
