@@ -14,3 +14,12 @@ var BLOCK_W    = 20;
 var BLOCK_H    = 20;
 var GRID_W     = Math.floor(cvs.width  / BLOCK_W);
 var GRID_H     = Math.floor(cvs.height / BLOCK_H);
+var COLOR_PER  = 20;
+var COLORS = [
+	'#0f0', // green
+	'#70f', // violet
+	'#f70', // orange
+	'#07f', // cyan
+	'#ff0', // yellow
+	'#00f', // blue
+];

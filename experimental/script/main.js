@@ -7,8 +7,9 @@ function init() {
 	var x = 0;
 	var y = 0;
 	var snake = new Snake(x, y, MIN_LENGTH);
+	game.colorI = 0;
 	snake.setContext(ctx);
-	snake.setColor('#0f0');
+	snake.setColor(COLORS[game.colorI]);
 	snake.setClearColor(bg.color);
 	
 	game.topLeft = {x: 0, y: 0};
@@ -122,6 +123,8 @@ function input() {
 function fail(doPlaySound, doResetApple) {
 	game.bg.draw();
 	game.snake.reset();
+	game.colorI = 0;
+	game.snake.setColor(COLORS[game.colorI]);
 	if (doResetApple) {
 		game.apple.construct(game.snake.blocks);
 	}
@@ -186,12 +189,19 @@ function collide() {
 	}
 	
 	if (snake.head.x == apple.x && snake.head.y == apple.y) {
-		if (++game.score % POINT_SPEC == 0) {
+		if (++game.score % POINT_SPEC === 0) {
 			game.oscill.setClass('pointspec');
 			game.oscill.activate();
 			playSound('scorex10');
 		} else {
 			playSound('eat');
+		}
+		
+		if (game.score % COLOR_PER === 0) {
+			// for every 20 points, change the color
+			game.colorI++;
+			game.colorI %= COLORS.length;
+			snake.setColor(COLORS[game.colorI]);
 		}
 		
 		if ((game.score == game.oScore + 1) && (game.oScore > 0)) {
